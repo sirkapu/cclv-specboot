@@ -2,8 +2,8 @@
 .DS_Store
 Thumbs.db
 
-# Editors
-.vscode/
+# Editors — repo-root only (template/.vscode/ is a tracked deliverable)
+/.vscode/
 .idea/
 *.swp
 
