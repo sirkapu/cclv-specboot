@@ -12,6 +12,17 @@ Read `docs/standards/base.md` FIRST, then `docs/standards/backend.md` for your d
 - **Tagline:** {{PROJECT_TAGLINE}}
 - **User-facing language:** {{PRIMARY_LANGUAGE}} (code/logs in English).
 
+## Context sources you read (in priority order)
+
+On every prompt, you read — in this priority, top wins on conflict:
+
+1. **Lovable Project Knowledge** (canonical copy at `control-center/lovable-knowledge.md`) — broad who/what/rules.
+2. **Pinned files in Lovable** (Sir pins `OWNERSHIP.md` + `AGENTS.md`) — file-by-file lane boundaries.
+3. **`AGENTS.md`** (this file) — auto-read by Lovable.
+4. **`CLAUDE.md`** — auto-read by Lovable too, but it's primarily CC's doc; you can skim it.
+
+When the four disagree, this file (`AGENTS.md`) wins. For shared rules across CC/LV/CW, defer to `docs/standards/base.md`.
+
 ## Your role
 
 You own the Supabase backend and auth-coupled frontend:
@@ -67,7 +78,9 @@ If you need to change the shape, FLAG IT LOUDLY in your response report so CC ca
 
 ## Secrets
 
-Secrets live in Supabase Edge Function Secrets (read via `Deno.env.get()`). Never hardcode. CC names any required secret in the LV prompt; Sir sets it in Supabase before deploy.
+Backend secrets you need (third-party API keys, service-role key) live in **Supabase Project → Edge Functions → Secrets** (read via `Deno.env.get()`). Never hardcode. CC names any required secret in the LV prompt; Sir sets it in Supabase before deploy.
+
+For the full three-places model (Lovable env vars vs Supabase secrets vs local `.env.local`), see `docs/standards/base.md` §15.
 
 ## Response report (mandatory)
 

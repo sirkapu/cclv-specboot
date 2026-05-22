@@ -2,6 +2,26 @@
 
 All notable changes to cclv-specboot. Follows [Keep a Changelog](https://keepachangelog.com).
 
+## [0.2.1] — 2026-05-22
+
+### Added — BOOTSTRAP.md parity gaps + multi-IDE support
+
+Closing four content gaps found in a post-Phase-2 audit, and adding entry-point files for non-Claude-Code IDEs.
+
+**`template/docs/standards/base.md`:**
+- §13 **Branch strategy & git flow** — `main` / `prod` / `feat/*` / `qa/CW-*` model, who pushes where, Sir's pull-first rule.
+- §14 **Hotfix & lane-violation recovery** — three protocols (LV rewrote CC file / prod broke / CC edited LV file).
+- §15 **Secrets — three places** — full table of Lovable env vars vs Supabase Edge Function Secrets vs local `.env.local`, plus `package.json` / lockfile coordination rule.
+
+**`template/AGENTS.md`:**
+- New "Context sources you read (in priority order)" section near the top — explicit priority for Lovable Knowledge / pinned files / AGENTS.md / CLAUDE.md, with the "AGENTS.md wins on conflict" rule.
+- "Secrets" section now points to `base.md` §15 for the full three-places model.
+
+**Multi-IDE entry files** (each is a thin pointer to `CLAUDE.md`; only Lovable reads `AGENTS.md`):
+- `template/.cursor/rules/main.mdc` — Cursor entry point.
+- `template/codex.md` — Codex / GitHub Copilot CLI entry point.
+- `template/GEMINI.md` — Gemini CLI entry point.
+
 ## [0.2.0] — 2026-05-22
 
 ### Added — Phase 2 (Standards + Skills + Control Center)

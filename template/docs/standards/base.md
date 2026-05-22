@@ -162,3 +162,51 @@ Skills live in `ai-specs/skills/` (mirrored to `.claude/skills/` via symlink on 
 - One concern per commit. If you need "and" in the commit message, split it.
 - Conventional commits where possible: `feat(scope):`, `fix(scope):`, `chore(scope):`, `docs(scope):`, `refactor(scope):`, `test(scope):`.
 - Commit messages in English even when UI is in another language.
+
+## 13. Branch strategy & git flow
+
+- **`main`** — Staging / active development. **Lovable pushes here.** CC also commits here unless a feature warrants isolation.
+- **`prod`** — Production. Only fast-forward merges from `main` when ready to ship. Created on first deploy.
+- **Feature branches** — Optional, CC's call. Use when an LV prompt is in flight and you don't want LV's push to overlap with your in-progress local work. Pattern: `feat/<short-name>` or `spike/<short-name>` for throwaway experiments.
+- **QA branches** — CC creates `qa/CW-[NAME]` for each CW pass. CW stays on that branch.
+- **Sir's role** — Always pull `origin/main` first before starting a CC session. Local can lag significantly behind LV's pushes.
+- **PR review** — Lovable typically pushes directly to `main`. Sir can switch Lovable to "open PR" mode in its UI if review is desired. Default: direct push, CC reviews via `bash scripts/verify-after-pull.sh`.
+- **Hotfix flow** — see §14.
+
+## 14. Hotfix & lane-violation recovery
+
+### When Lovable rewrote a CC-owned file
+
+1. **Don't immediately revert.** Read the diff first — sometimes LV's change is legitimate (a real bug it noticed) and just landed in the wrong lane.
+2. **Quarantine:** `git restore --source=<previous-commit> -- <path>` to undo only that file.
+3. **If LV's change was correct in spirit:** CC re-implements it cleanly in the CC layer. Note in `build-state.md` + sharpen `OWNERSHIP.md` to prevent recurrence.
+4. **If recurring,** add a rule to `control-center/lovable-knowledge.md` (e.g. "never edit `src/components/X` even if you see a bug — flag it in your response report").
+
+### When prod breaks
+
+1. Roll back: `git revert <commit>` on the `prod` branch.
+2. Push.
+3. Open a `CW-HOTFIX-[NAME].md` brief for post-mortem.
+4. Treat root-cause fix as a normal feature: contract → LV prompt → CC wire-up → CW verify → merge.
+
+### When CC accidentally edits an LV-owned file
+
+Same protocol in reverse. Log it in `build-state.md` under "Lane Crossings". Apologize in the next LV prompt and explain. Strengthen `OWNERSHIP.md` if the path was ambiguous.
+
+## 15. Secrets — three places
+
+Three locations store secrets. They do NOT auto-sync. Sir maintains them.
+
+| Location | What goes there | Who sets it |
+|----------|----------------|-------------|
+| **Lovable Project → Env Variables** | Frontend-facing public values (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`). Available to LV during edits. | Sir |
+| **Supabase Project → Edge Functions → Secrets** | Backend-only secrets (service-role key, third-party API keys like OpenAI / Stripe). Read by edge functions via `Deno.env.get()`. | Sir |
+| **Local `.env.local`** | What Sir uses for `npm run dev`. Mirrors Lovable's env. Never committed. | Sir |
+
+**Rules:**
+
+1. `.env.example` is the canonical list of required env vars (no values). CC maintains it.
+2. `.env`, `.env.local`, `.env.*.local` are gitignored. Always.
+3. Secrets never appear in LV prompts, CC prompts, code, commit messages, or docs.
+4. When CC needs a new secret for an edge function, the LV prompt says: *"requires secret `FOO_API_KEY` — Sir will set it in Supabase secrets before deploy."*
+5. `package.json` / lockfile coordination: Lovable adds packages via its UI (updates `package.json`). CC adds via `npm install <pkg>`. Conflicts resolve in favor of the most recent commit; if both add the same package at different versions, CC reconciles after the next pull and notes in `build-state.md`.
