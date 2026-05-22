@@ -1,0 +1,53 @@
+# cclv-specboot — patterns to append to your project's .gitignore
+# After running bin/install.sh, run:
+#   cat .gitignore.append >> .gitignore
+#   rm .gitignore.append
+
+# Env files (never commit secrets)
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+dist/
+build/
+.next/
+out/
+
+# Node
+node_modules/
+.npm/
+.pnpm-store/
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Lovable (per Lovable docs — they manage these)
+.lovable/
+
+# Local Supabase (if using CLI)
+supabase/.temp/
+supabase/.branches/
+
+# Test artifacts
+coverage/
+playwright-report/
+test-results/
+
+# Misc
+.cache/
+*.local
