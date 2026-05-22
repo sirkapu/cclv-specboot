@@ -2,6 +2,15 @@
 
 All notable changes to cclv-specboot. Follows [Keep a Changelog](https://keepachangelog.com).
 
+## [0.2.2] — 2026-05-22
+
+### Added — Community polish (Tier C)
+
+- **`CONTRIBUTING.md`** at repo root — how to contribute, project layout, skill/standard authoring conventions, versioning policy, manual testing checklist, release process.
+- **`.github/PULL_REQUEST_TEMPLATE.md`** — fills automatically on PR creation; covers type, testing, changelog discipline, dogfooded engineering rules.
+- **`BOOTSTRAP-PROMPT.md`** at repo root — paste-into-CC install path, complementing `bin/install.sh` automated path. CC walks through preflight → install → placeholders → Lovable setup → first LV prompt.
+- **`template/.vscode/settings.json`** — sensible VSCode defaults for new projects (TS workspace SDK, Prettier on save, ESLint autofix, Tailwind CVA/cn regex, file/search excludes).
+
 ## [0.2.1] — 2026-05-22
 
 ### Added — BOOTSTRAP.md parity gaps + multi-IDE support

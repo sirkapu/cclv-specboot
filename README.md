@@ -43,16 +43,24 @@ If only ONE AI agent works on your repo, use [lidr-specboot](https://github.com/
 
 ## Install
 
+Two paths — pick whichever fits your workflow.
+
+### Path 1 — Automated (recommended)
+
 ```bash
-# 1. Clone this repo
-git clone https://github.com/YOUR_ORG/cclv-specboot.git /tmp/cclv-specboot
-
-# 2. Run installer (non-destructive — won't overwrite existing files)
+git clone https://github.com/sirkapu/cclv-specboot.git /tmp/cclv-specboot
 bash /tmp/cclv-specboot/bin/install.sh /path/to/your/project
-
-# 3. Read INSTALL.md for placeholder-filling and Lovable setup steps
-cat /path/to/your/project/INSTALL.md
 ```
+
+Then follow the placeholder-filling and Lovable setup steps in [INSTALL.md](./INSTALL.md).
+
+### Path 2 — Paste-prompt (AI-driven)
+
+Open [BOOTSTRAP-PROMPT.md](./BOOTSTRAP-PROMPT.md), copy the entire file, paste it into a fresh Claude Code session inside your project's local clone. CC walks through preflight, install, placeholders, Lovable setup, and drafts your first LV prompt.
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) — covers project layout, how to add a skill or standard, multi-IDE support, file size limits (dogfooded), versioning, and the manual testing checklist.
 
 ## How this differs from lidr-specboot
 
