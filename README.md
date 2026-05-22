@@ -58,6 +58,10 @@ Then follow the placeholder-filling and Lovable setup steps in [INSTALL.md](./IN
 
 Open [BOOTSTRAP-PROMPT.md](./BOOTSTRAP-PROMPT.md), copy the entire file, paste it into a fresh Claude Code session inside your project's local clone. CC walks through preflight, install, placeholders, Lovable setup, and drafts your first LV prompt.
 
+## Examples
+
+See [`docs/examples/`](./docs/examples/) for project-specific customizations of the kit. First entry: [`aura-style-bootstrap.md`](./docs/examples/aura-style-bootstrap.md) — the AURA-flavored paste-prompt that originally produced cclv-specboot.
+
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) — covers project layout, how to add a skill or standard, multi-IDE support, file size limits (dogfooded), versioning, and the manual testing checklist.

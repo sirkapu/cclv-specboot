@@ -2,6 +2,14 @@
 
 All notable changes to cclv-specboot. Follows [Keep a Changelog](https://keepachangelog.com).
 
+## [0.2.3] — 2026-05-22
+
+### Added — First reference example (Phase 3 starter)
+
+- **`docs/examples/`** — directory for project-specific customization examples.
+- **`docs/examples/README.md`** — index + how-to-use.
+- **`docs/examples/aura-style-bootstrap.md`** — the AURA-flavored paste-prompt that originally produced cclv-specboot. Shows what a real project-specific bootstrap looks like with credits + desktop-first + light Portal safety opinions baked in. Header points readers to the generic `BOOTSTRAP-PROMPT.md` first.
+
 ## [0.2.2] — 2026-05-22
 
 ### Added — Community polish (Tier C)
