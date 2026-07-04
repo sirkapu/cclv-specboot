@@ -29,7 +29,7 @@
 For each migration:
 
 ```
-20260522T140000_add_foos.sql
+20260522140000_add_foos.sql
 - Creates public.foos table with columns: id, user_id, name, created_at.
 - Adds index idx_foos_user_id.
 - RLS: enabled. Policies: foos_select_owner, foos_insert_owner.

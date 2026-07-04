@@ -145,5 +145,5 @@ When you DO suggest a fix:
 
 - Diff format (unified diff or GitHub-style `+/-` lines).
 - Smallest viable change. Don't refactor.
-- Cite the standard you're applying (e.g. "per `docs/standards/frontend.md` §10, loading states must show after 500ms").
+- Cite the standard you're applying (e.g. "per `docs/standards/frontend.md` §9, loading states must show after 500ms").
 - Mark "Suggested" — CC decides whether to apply.

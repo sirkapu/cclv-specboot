@@ -30,6 +30,7 @@ What it does:
 - Copies `template/*` into your project (non-destructive — `cp -rn`, won't overwrite existing files).
 - Makes `scripts/*.sh` executable.
 - Sets up `.claude/skills/` symlinks pointing to `ai-specs/skills/*` (macOS/Linux only — see Cross-platform below).
+- Merges `.gitignore.append` into the project's `.gitignore` (created if absent).
 
 ### 3. Fill placeholders
 
@@ -42,7 +43,7 @@ Open these files and replace `{{...}}` placeholders:
 
 Find every placeholder:
 ```bash
-grep -rn "{{" CLAUDE.md AGENTS.md OWNERSHIP.md docs/standards/
+grep -rln '{{' . | grep -v node_modules | grep -v .git
 ```
 
 ### 4. Connect the Lovable MCP (recommended)

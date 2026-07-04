@@ -27,7 +27,7 @@ How CC, LV, and CW collaborate. Concrete worked example below.
    │      │                                                    │  │
    │      ▼                                                    │  │
    │  CC: lv-response-reader (get_message + get_diff)          │  │
-   │      → writes lv-responses/ (or lv-blockers/)             │  │
+   │      → writes lv-responses/                               │  │
    │      │                                                    │  │
    │      ▼                                                    │  │
    │  Sir pulls; CC: verify-after-pull                         │  │
@@ -88,7 +88,7 @@ Sends it to LV via the Lovable MCP (`send_message`).
 ### Step 4 — LV executes
 
 CC polls `get_message`. LV asks one question mid-run ("charge credits before or after the provider call?") — CC answers in-chat. LV pushes to `main`:
-- `supabase/migrations/20260522T140000_add_generated_images.sql`.
+- `supabase/migrations/20260522140000_add_generated_images.sql`.
 - `supabase/functions/generate-product-image/index.ts`.
 - `supabase/functions/_shared/...` (if extended).
 

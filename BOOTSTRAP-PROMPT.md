@@ -60,7 +60,7 @@ If any "no" — pause and tell Sir what's missing. (No Lovable project at all ye
 2. **CC installs cclv-specboot** (step 1 below).
 3. **CC fills placeholders** (step 2 below).
 4. **CC syncs Lovable Knowledge via MCP; Sir pins files** (step 3 below).
-5. **CC writes first LV prompt** (step 6 below).
+5. **CC writes first LV prompt** (step 8 below).
 
 ## Steps
 

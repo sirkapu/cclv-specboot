@@ -21,4 +21,4 @@ Running session log. Newest at top. Updated at end of every session that ships c
 
 **Lane crossings:** none
 **Lovable Knowledge:** initial sync via MCP (or paste) — confirmed.
-**Notes:** Project initialized via cclv-specboot v0.1.0. See `docs/reports/{{TODAY}}-bootstrap.md` for setup details.
+**Notes:** Project initialized via cclv-specboot v0.3.0. See `docs/reports/{{TODAY}}-bootstrap.md` for setup details.
