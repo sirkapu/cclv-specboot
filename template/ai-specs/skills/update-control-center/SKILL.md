@@ -43,7 +43,7 @@ Append (newest at top):
 - [ ] [item]
 
 **Lane crossings:** [none | list]
-**Lovable Knowledge:** [unchanged | updated, Sir to re-paste]
+**Lovable Knowledge:** [unchanged | updated, synced via MCP | updated, Sir to re-paste]
 **Notes:** [free text]
 ```
 
@@ -94,7 +94,7 @@ git add control-center/ CLAUDE.md OWNERSHIP.md docs/
 git commit -m "chore(control-center): sync after session YYYY-MM-DD"
 ```
 
-If `lovable-knowledge.md` changed, tell Sir to re-paste.
+If `lovable-knowledge.md` changed, sync via `set_project_knowledge` (no MCP? tell Sir to re-paste). See the `kb-sync` skill.
 
 ## Doc rot check
 
@@ -113,6 +113,6 @@ If any of those is true, fix it in the same sync.
 - [ ] `roadmap.md` updated (or N/A).
 - [ ] `OWNERSHIP.md` updated (or N/A).
 - [ ] `CLAUDE.md` known-issues updated.
-- [ ] `lovable-knowledge.md` updated + Sir told (or N/A).
+- [ ] `lovable-knowledge.md` updated + synced (or Sir told, or N/A).
 - [ ] Session reports generated (or skipped with reason).
 - [ ] Control-center sync committed.

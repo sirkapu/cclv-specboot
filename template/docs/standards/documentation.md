@@ -26,10 +26,10 @@ Lovable's Knowledge field (Project Settings → Knowledge, 10,000 char limit) is
 When you update `control-center/lovable-knowledge.md`:
 
 1. Commit the change.
-2. In the same session, tell Sir: **"Re-paste `control-center/lovable-knowledge.md` into Lovable → Settings → Knowledge."**
-3. Record in `build-state.md`: "Knowledge updated — Sir to re-paste."
+2. In the same session, push it via the Lovable MCP (`set_project_knowledge`) and confirm with `get_project_knowledge`. No MCP? Tell Sir: **"Re-paste `control-center/lovable-knowledge.md` into Lovable → Settings → Knowledge."**
+3. Record in `build-state.md`: "Knowledge updated — synced via MCP" (or "— Sir to re-paste").
 
-If Sir doesn't re-paste, LV operates on stale context. This is a quiet bug. Always surface.
+If the sync doesn't happen, LV operates on stale context. This is a quiet bug. Always surface.
 
 ### When to update Knowledge
 

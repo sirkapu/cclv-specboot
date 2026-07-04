@@ -1,6 +1,6 @@
 # {{PROJECT_NAME}} — Project Knowledge
 
-> **Sir:** paste the content below into Lovable → Project Settings → Knowledge. Keep this file as the canonical version. Re-paste whenever this file changes.
+> This file is the canonical version of Lovable's Project Knowledge. CC syncs it via the Lovable MCP (`set_project_knowledge`) whenever it changes — see the `kb-sync` skill. No MCP? Sir pastes the content below into Lovable → Project Settings → Knowledge manually.
 
 ---
 
@@ -57,7 +57,7 @@ All edge function request/response types live in `src/contracts/`. When CC asks 
 
 Read the Engineering Discipline section in `AGENTS.md` before every edit. Short version:
 
-- **Surface assumptions, don't guess.** If ambiguous, write to `control-center/lv-blockers/` — don't pick silently.
+- **Surface assumptions, don't guess.** If ambiguous, ask in your chat reply (CC answers) or write to `control-center/lv-blockers/` — don't pick silently.
 - **Minimum code that solves the problem.** No speculative features, no abstractions for single-use code.
 - **Touch only what you must.** Don't refactor adjacent code. If you notice unrelated dead code, mention it — don't delete it.
 - **Define a verifiable success criterion before you start** (migration applies, endpoint returns expected shape, RLS denies unauthorized access). Loop until verified.
@@ -71,7 +71,7 @@ Read the Engineering Discipline section in `AGENTS.md` before every edit. Short 
 
 ## Response report (mandatory)
 
-After every LV prompt, write `control-center/lv-responses/LV-[NAME]-response.md` covering:
+Every LV prompt ends with a response report at `control-center/lv-responses/LV-[NAME]-response.md`. When CC sent the prompt via the Lovable MCP (default), CC writes it from your chat reply — make the reply complete. When Sir pasted the prompt, YOU write the file. Either way it covers:
 
 - Files created/modified/deleted.
 - Migration filenames + summary.
@@ -83,7 +83,7 @@ After every LV prompt, write `control-center/lv-responses/LV-[NAME]-response.md`
 
 ## If you get stuck
 
-Write `control-center/lv-blockers/LV-[NAME]-blocker.md` with: the prompt you got, what you can't resolve, what you tried, options you see, your recommendation. Do NOT guess. CC reads `lv-blockers/` at the start of every session.
+Ask in your chat reply first — CC answers with a follow-up message. If that doesn't resolve it (or the prompt was pasted manually), write `control-center/lv-blockers/LV-[NAME]-blocker.md` with: the prompt you got, what you can't resolve, what you tried, options you see, your recommendation. Do NOT guess. CC reads `lv-blockers/` at the start of every session.
 
 ## Tech stack
 

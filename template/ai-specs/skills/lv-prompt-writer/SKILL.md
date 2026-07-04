@@ -3,7 +3,7 @@ name: lv-prompt-writer
 description: Use when CC needs to write a Lovable (LV) prompt for backend work — new edge function, new migration, RLS change, secrets setup, schema migration. Triggers when CC says "write an LV prompt", "ship X to backend", "need an edge function for", "Lovable needs to", or detects that a planned slice requires a backend deliverable.
 applies_to: [CC]
 author: cclv-specboot
-version: 0.1.0
+version: 0.2.0
 ---
 
 # lv-prompt-writer
@@ -68,23 +68,29 @@ Numbered list of exact deliverables.
 ## Do Not Modify (CC-owned)
 Read `OWNERSHIP.md`. Specifically: `src/components/**` (except `ui/`), `src/pages/**` (except `Auth/`), `src/contracts/**`, `src/hooks/**` (except `useAuth`), `src/styles/**`, `CLAUDE.md`, `OWNERSHIP.md`, `AGENTS.md`, `control-center/**` (except writing into `lv-responses/` and `lv-blockers/`), `scripts/**`.
 
-## Response Report (MANDATORY)
-Write `control-center/lv-responses/LV-[NAME]-response.md` per AGENTS.md "Response report" section.
+## Response Report
+This prompt was sent via the Lovable MCP. In your chat reply, cover every item in AGENTS.md "Response report" — CC distills it into `control-center/lv-responses/LV-[NAME]-response.md`. If anything is unclear, ASK in your reply before building.
+<!-- Paste mode instead: "Write control-center/lv-responses/LV-[NAME]-response.md per AGENTS.md 'Response report' section." -->
+
 
 ## Testing Checklist
 - [ ] Specific test 1
 - [ ] Specific test 2
 ````
 
-### Step 4 — Save the prompt
+### Step 4 — Save, then send via the Lovable MCP
 
-Save to `control-center/lv-prompts/LV-[NAME].md`. Tell Sir: "Paste this into Lovable when ready."
+Save to `control-center/lv-prompts/LV-[NAME].md` (audit trail — always, even in MCP mode). Then send the prompt body to LV with `send_message`.
 
-### Step 5 — Wait
+**No MCP connected?** Tell Sir: "Paste this into Lovable when ready" — and swap the prompt's Response Report section to paste mode (LV writes the file itself).
 
-Do not start frontend work that depends on the new edge function until LV's response is in `control-center/lv-responses/`. If you need to start in parallel, mock the contract response — but flag it loudly in your `build-state.md` entry so the mock gets removed when the real endpoint is live.
+### Step 5 — Poll and converse
 
-## Checklist (tick before sending the prompt to Sir)
+Poll `get_message` until LV finishes. If LV asks a question, answer with a follow-up `send_message` — don't let it guess. When done, hand off to the `lv-response-reader` skill (reads the reply + `get_diff`, writes the response report).
+
+Do not start frontend work that depends on the new edge function until the response report is in `control-center/lv-responses/`. If you need to start in parallel, mock the contract response — but flag it loudly in your `build-state.md` entry so the mock gets removed when the real endpoint is live.
+
+## Checklist (tick before sending the prompt)
 
 - [ ] Work is in LV's lane (or hybrid is split into phases).
 - [ ] Contract file in `src/contracts/` is updated/created and committed.
@@ -93,6 +99,7 @@ Do not start frontend work that depends on the new edge function until LV's resp
 - [ ] "Do Not Modify" section is explicit.
 - [ ] Testing Checklist has concrete cases (not "test it works").
 - [ ] Prompt saved to `control-center/lv-prompts/LV-[NAME].md`.
+- [ ] Sent via `send_message` (or handed to Sir to paste, with the Response Report section in paste mode).
 
 ## Common failure modes
 

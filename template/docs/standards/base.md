@@ -20,7 +20,7 @@ Don't assume. Don't hide confusion. Surface tradeoffs.
 - If a simpler approach exists, say so.
 - If something is unclear: stop.
   - **CC** asks Sir directly.
-  - **LV** writes to `control-center/lv-blockers/LV-[NAME]-blocker.md` and stops. Do NOT guess.
+  - **LV** asks in the chat reply when CC drove the prompt via the Lovable MCP (CC answers with a follow-up message); if the exchange doesn't resolve it — or the prompt was pasted manually — writes to `control-center/lv-blockers/LV-[NAME]-blocker.md` and stops. Do NOT guess.
   - **CW** notes "Questions for CC" in the report.
 
 ### §2 — Simplicity first
@@ -66,6 +66,8 @@ For multi-step tasks, state a plan with verify-checks per step:
 1. [Step] → verify: [check]
 2. [Step] → verify: [check]
 ```
+
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
 **Per-agent "verify" means:**
 - **CC** — run lint, run build, exercise the flow in browser.
@@ -148,7 +150,7 @@ When no test framework is configured: define a verifiable behavior in the LV pro
 
 - New feature → update relevant `docs/` and `control-center/architecture.md` in the SAME PR.
 - Stale docs are a regression.
-- The Lovable Knowledge field is canonically stored at `control-center/lovable-knowledge.md` — when this file changes, ping Sir to re-paste into Lovable's Knowledge UI.
+- The Lovable Knowledge field is canonically stored at `control-center/lovable-knowledge.md` — when this file changes, CC syncs it via the Lovable MCP (`set_project_knowledge`). No MCP? Ping Sir to re-paste into Lovable's Knowledge UI.
 
 ## 11. Skills are auto-loaded
 

@@ -58,7 +58,11 @@ Read `OWNERSHIP.md`. Specifically:
 
 ## Response Report (MANDATORY)
 
-After completing this work, create `control-center/lv-responses/LV-[NAME]-response.md` using the TEMPLATE.md in that directory. Include:
+<!-- MCP mode (default) — keep this paragraph: -->
+This prompt was sent via the Lovable MCP. In your chat reply, cover every item below — CC distills your reply + diff into `control-center/lv-responses/LV-[NAME]-response.md`.
+
+<!-- Paste mode — use this paragraph instead: -->
+<!-- After completing this work, create `control-center/lv-responses/LV-[NAME]-response.md` using the TEMPLATE.md in that directory. Include: -->
 
 - Files created / modified / deleted.
 - Migration filenames + summary.
@@ -70,7 +74,7 @@ After completing this work, create `control-center/lv-responses/LV-[NAME]-respon
 
 ## If You Get Stuck
 
-Do NOT guess. Write `control-center/lv-blockers/LV-[NAME]-blocker.md` with: what you can't resolve, what you tried, options you see, your recommendation.
+Do NOT guess. Ask in your chat reply first — CC answers with a follow-up message. If that doesn't resolve it (or this prompt was pasted manually), write `control-center/lv-blockers/LV-[NAME]-blocker.md` with: what you can't resolve, what you tried, options you see, your recommendation.
 
 ## Testing Checklist
 

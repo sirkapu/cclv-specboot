@@ -1,16 +1,16 @@
 ---
 name: kb-sync
-description: Use when CC updates `control-center/lovable-knowledge.md` and needs Sir to re-paste it into Lovable's Knowledge UI. Triggers when CC says "update Knowledge", "LV's mental model needs to change", "sync Knowledge with Lovable", or after structural changes that LV needs to know about.
+description: Use when CC updates `control-center/lovable-knowledge.md` and needs it synced into Lovable's Knowledge (via the Lovable MCP `set_project_knowledge`, or Sir re-pastes as fallback). Triggers when CC says "update Knowledge", "LV's mental model needs to change", "sync Knowledge with Lovable", or after structural changes that LV needs to know about.
 applies_to: [CC]
 author: cclv-specboot
-version: 0.1.0
+version: 0.2.0
 ---
 
 # kb-sync
 
 ## When to use
 
-Lovable reads its Project Settings → Knowledge field on every prompt (10K char limit). The repo file `control-center/lovable-knowledge.md` is the canonical version. They do NOT auto-sync — Sir must manually re-paste when the canonical changes.
+Lovable reads its Project Settings → Knowledge field on every prompt (10K char limit). The repo file `control-center/lovable-knowledge.md` is the canonical version. They do NOT auto-sync — CC pushes it via the Lovable MCP (`set_project_knowledge`) when the canonical changes; without MCP, Sir re-pastes manually.
 
 Use this skill when something Lovable should know about has shifted:
 
@@ -39,7 +39,7 @@ If you're approaching the limit, consider moving content to `docs/standards/` an
 git diff control-center/lovable-knowledge.md
 ```
 
-If it's a typo fix or pure formatting, skip the re-paste — not worth bothering Sir.
+If it's a typo fix or pure formatting, skip the sync — not worth a round-trip.
 
 If it's a real semantic change (new rule, new pattern, new ownership), continue.
 
@@ -50,9 +50,11 @@ git add control-center/lovable-knowledge.md
 git commit -m "docs(knowledge): <one-line change summary>"
 ```
 
-### Step 4 — Tell Sir
+### Step 4 — Sync via the Lovable MCP
 
-In the chat, surface clearly:
+Push the full file content with `set_project_knowledge`, then read it back with `get_project_knowledge` and confirm it matches the repo file.
+
+**No MCP connected?** Tell Sir in chat:
 
 > **Knowledge updated.** Re-paste `control-center/lovable-knowledge.md` into Lovable → Settings → Knowledge. The change: <one-line>.
 
@@ -61,12 +63,12 @@ In the chat, surface clearly:
 Add a line to the current session entry:
 
 ```markdown
-**Lovable Knowledge:** updated `<file>` — Sir to re-paste. Change: <summary>.
+**Lovable Knowledge:** updated `<file>` — synced via MCP (or: Sir to re-paste). Change: <summary>.
 ```
 
 ### Step 6 — Verify next LV prompt
 
-When you write the next LV prompt, confirm the new pattern is reflected in LV's behavior. If LV still acts on the old context, the re-paste didn't happen — ping Sir again.
+When you write the next LV prompt, confirm the new pattern is reflected in LV's behavior. If LV still acts on the old context, re-run the sync (`get_project_knowledge` shows what LV actually sees) — or, in paste mode, ping Sir again.
 
 ## Character count check
 
@@ -78,7 +80,8 @@ Keep under 9,500 to leave headroom.
 
 ## Anti-patterns
 
-- ❌ Editing Knowledge silently — Sir won't know to re-paste. Always announce.
+- ❌ Editing the repo file without syncing — LV keeps acting on stale Knowledge. Always sync (or announce, in paste mode).
+- ❌ Editing Knowledge via `set_project_knowledge` without updating the repo file first. The repo file is canonical; the MCP push mirrors it, never the reverse.
 - ❌ Dumping CLAUDE.md content into Knowledge. LV doesn't need CC's full architecture.
 - ❌ Cramming per-feature details. Those go in the LV prompt.
 
@@ -87,5 +90,5 @@ Keep under 9,500 to leave headroom.
 - [ ] Change is semantically meaningful (not just formatting).
 - [ ] Under 10K characters.
 - [ ] Committed.
-- [ ] Sir told to re-paste.
+- [ ] Synced via `set_project_knowledge` + read back (or Sir told to re-paste).
 - [ ] Recorded in `build-state.md`.

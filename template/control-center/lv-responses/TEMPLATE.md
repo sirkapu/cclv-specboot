@@ -1,12 +1,13 @@
 # LV-[NAME] Response Report
 
 > Save as `control-center/lv-responses/LV-[NAME]-response.md` matching the prompt's NAME.
+> **Author:** CC in MCP mode (distilled from LV's chat reply + `get_diff`); LV itself in paste mode.
 
 ## Prompt Reference
 
 - **Prompt:** `control-center/lv-prompts/LV-[NAME].md`
 - **Date completed:** YYYY-MM-DD
-- **Lovable session:** [session id if available]
+- **Channel:** Lovable MCP (`message_id` if available) / pasted by Sir
 
 ## Files created
 

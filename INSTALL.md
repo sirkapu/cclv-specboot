@@ -8,7 +8,7 @@ Before running install, your project must have:
 2. **Supabase project** wired to Lovable (project URL + anon key set in Lovable's env vars).
 3. **Local clone** of the GitHub repo.
 4. `npm install` runs cleanly inside the clone.
-5. Access to **Lovable → Project Settings → Knowledge** (to paste content into).
+5. **Lovable MCP** connected in Claude Code (recommended — step 4 below). Without it, you'll need access to **Lovable → Project Settings → Knowledge** to paste content manually.
 
 If any of these is missing, stop and fix it first. The install script assumes a working Lovable+Supabase+GitHub triangle.
 
@@ -45,19 +45,33 @@ Find every placeholder:
 grep -rn "{{" CLAUDE.md AGENTS.md OWNERSHIP.md docs/standards/
 ```
 
-### 4. Set up Lovable Knowledge
+### 4. Connect the Lovable MCP (recommended)
+
+Gives CC a direct line to Lovable: send LV prompts (`send_message`), read diffs (`get_diff`), sync Knowledge (`set_project_knowledge`), and more.
+
+```bash
+claude mcp add --transport http lovable https://mcp.lovable.dev
+```
+
+Restart Claude Code, verify with `/mcp` — a browser OAuth window opens on first tool call. Skipping this is fine: the kit falls back to the manual paste flow everywhere.
+
+### 5. Set up Lovable Knowledge
+
+**With MCP:** ask CC to run the `kb-sync` skill — it pushes `control-center/lovable-knowledge.md` via `set_project_knowledge` and verifies the readback.
+
+**Without MCP:**
 
 1. Open Lovable → Project Settings → Knowledge.
 2. Paste the full content of `control-center/lovable-knowledge.md`.
 3. Save.
 
-### 5. Pin canonical files in Lovable
+### 6. Pin canonical files in Lovable
 
 In Lovable's project settings, pin these so LV reads them on every prompt:
 - `OWNERSHIP.md`
 - `AGENTS.md`
 
-### 6. Verify
+### 7. Verify
 
 ```bash
 cd /path/to/your/project

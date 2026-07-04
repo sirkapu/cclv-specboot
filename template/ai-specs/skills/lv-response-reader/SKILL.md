@@ -1,26 +1,33 @@
 ---
 name: lv-response-reader
-description: Use when CC opens a fresh `LV-[NAME]-response.md` to triage what LV shipped. Triggers when CC says "read LV's response", "process LV's report", or after `git pull` introduces new files in `control-center/lv-responses/`.
+description: Use when CC needs to triage what LV shipped — after an MCP `send_message` completes, or when a fresh `LV-[NAME]-response.md` lands after a pull (paste mode). Triggers when CC says "read LV's response", "process LV's report", or `get_message` reports the LV run finished.
 applies_to: [CC]
 author: cclv-specboot
-version: 0.1.0
+version: 0.2.0
 ---
 
 # lv-response-reader
 
 ## When to use
 
-After LV ships work and you've pulled the new branch. Use BEFORE you wire frontend against the new endpoint.
+After LV ships work. Use BEFORE you wire frontend against the new endpoint.
 
-This skill is paired with `verify-after-pull` — that one verifies the code; this one processes the report.
+This skill is paired with `verify-after-pull` — that one verifies the code locally after Sir pulls; this one processes LV's response.
 
 ## Procedure
 
-### Step 1 — Open the file
+### Step 1 — Gather LV's output
 
-`control-center/lv-responses/LV-[NAME]-response.md`
+**MCP mode (default):**
 
-### Step 2 — Read top-to-bottom; flag each section
+1. Read LV's final chat reply via `get_message`.
+2. Pull the code diff via `get_diff` (use the `message_id` from `send_message`).
+3. Cross-check: every file LV claims in the reply should appear in the diff, and vice versa. Mismatch = ask LV in-chat via `send_message` before proceeding.
+4. **You write the report:** distill reply + diff into `control-center/lv-responses/LV-[NAME]-response.md` (use the TEMPLATE; cover every section of AGENTS.md "Response report"). Commit it.
+
+**Paste mode:** open `control-center/lv-responses/LV-[NAME]-response.md` — LV wrote it.
+
+### Step 2 — Read the response top-to-bottom; flag each section
 
 | Section | What to do |
 |---------|------------|
@@ -47,7 +54,7 @@ This skill is paired with `verify-after-pull` — that one verifies the code; th
 
 ### Step 4 — Smoke-test before wiring
 
-Even if LV says "tests passed", run the flow yourself:
+Even if LV says "tests passed", run the flow yourself once Sir has pulled LV's push:
 
 1. `npm run dev`.
 2. Exercise the user flow that hits the new endpoint.
@@ -71,6 +78,7 @@ If LV's prompt is fully shipped and verified, you can move `LV-[NAME].md` and `L
 
 ## Checklist
 
+- [ ] MCP mode: reply + diff cross-checked, report written to `lv-responses/` and committed.
 - [ ] Read every section of the response.
 - [ ] Lane crossings audited (each diff reviewed).
 - [ ] Contract changes reconciled in `src/contracts/`.

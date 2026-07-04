@@ -11,7 +11,7 @@ Inspired by [lidr-specboot](https://github.com/LIDR-academy/lidr-specboot) — r
 You're building a React + Supabase product and:
 
 - **Lovable** scaffolds + owns the backend (edge functions, migrations, RLS, auth).
-- **Claude Code** in your local IDE owns the frontend, contracts, and project docs.
+- **Claude Code** in your local IDE owns the frontend, contracts, and project docs — and drives Lovable directly through the [Lovable MCP](https://docs.lovable.dev/integrations/lovable-mcp-server) (sends build prompts, reads diffs, syncs Knowledge; manual paste flow remains as fallback).
 - A **second Claude session** (Cowork or a separate Claude Code) reviews + QAs.
 - You want all three agents to stay in their lanes, share standards, and not step on each other.
 
@@ -80,7 +80,7 @@ Single source of truth for cross-cutting rules; per-agent docs layer on top. See
 
 ## Status
 
-**v0.2.0 — Phase 2 complete.** Full workflow kit: agent docs, per-role standards (frontend/backend/qa/documentation), 12 reusable skills, agent personas, control-center templates, scripts. Ready for use on new projects.
+**v0.3.0 — Lovable MCP integration.** CC now drives Lovable directly over MCP (send prompts, read diffs, sync Knowledge) with the paste flow kept as fallback. Built on the v0.2.x full workflow kit: agent docs, per-role standards, 12 reusable skills, agent personas, control-center templates, scripts.
 
 See [CHANGELOG.md](./CHANGELOG.md) for the full list. Phase 3 (example projects, per-stack adaptations, npm-installable variant) on the roadmap.
 

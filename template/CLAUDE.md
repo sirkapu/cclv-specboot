@@ -109,13 +109,36 @@ See `src/contracts/README.md`.
 ## Workflow loop
 
 1. You plan the next slice → write `LV-[NAME].md` if backend work is needed; otherwise build directly.
-2. LV executes → ships migrations + edge functions → writes `LV-[NAME]-response.md`.
-3. Sir pulls LV's branch → you run `bash scripts/verify-after-pull.sh`.
-4. You wire the frontend against the new contract → commit.
-5. You write `CW-[NAME].md` brief if the slice is user-facing.
-6. CW runs the brief → files `CW-[NAME]-report.md`.
-7. You triage the report → frontend fixes go directly; backend issues become a new LV prompt.
-8. You update `build-state.md` + (if needed) `lovable-knowledge.md` at end of session.
+2. You send the prompt to LV via the Lovable MCP (`send_message`) → poll `get_message` until done.
+3. LV executes → ships migrations + edge functions. You read its reply + diff (`get_message`, `get_diff`), answer any LV questions in-chat, then write `LV-[NAME]-response.md` yourself.
+4. Sir pulls LV's push → you run `bash scripts/verify-after-pull.sh`.
+5. You wire the frontend against the new contract → commit.
+6. You write `CW-[NAME].md` brief if the slice is user-facing.
+7. CW runs the brief → files `CW-[NAME]-report.md`.
+8. You triage the report → frontend fixes go directly; backend issues become a new LV prompt.
+9. You update `build-state.md` + (if needed) sync `lovable-knowledge.md` at end of session.
+
+No Lovable MCP connected? Fall back to the courier flow: Sir pastes the prompt into Lovable, LV writes its own response report, Sir re-pastes Knowledge changes.
+
+## Lovable MCP channel
+
+The Lovable MCP server (`https://mcp.lovable.dev`) is your direct line to LV. Verify it's connected with `/mcp` at session start; setup lives in the kit's INSTALL doc.
+
+**Use freely** (chat + read-only; `send_message` debits Lovable build credits — that's expected, it's how LV works):
+
+- `send_message` / `get_message` — send LV prompts, read replies, answer LV's questions.
+- `get_diff`, `list_files`, `read_file` — inspect LV's work before Sir pulls.
+- `get_project_knowledge` / `set_project_knowledge` — sync `control-center/lovable-knowledge.md` (kb-sync skill).
+- `query_database` — **SELECT only**, for debugging and verification.
+- Analytics tools — post-deploy traffic checks.
+
+**Ask Sir first** (live effects beyond the normal loop):
+
+- `deploy_project` — publishes a live URL.
+- `create_project` — spins up a new Lovable project on the account.
+- Any DDL/DML via `query_database` — schema and data changes are LV's lane; route them through an LV prompt. Direct DDL from you is a lane crossing even with permission.
+
+MCP inspection never replaces the local gate: after Sir pulls, `verify-after-pull.sh` still runs.
 
 ## File size standards (also in base.md)
 

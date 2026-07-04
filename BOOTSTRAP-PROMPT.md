@@ -49,16 +49,17 @@ Ask Sir if any are missing.
 - [ ] Supabase project connected to Lovable.
 - [ ] Repo cloned locally; Sir is running CC inside the clone.
 - [ ] `npm install` runs cleanly (or pnpm/yarn equivalent).
-- [ ] Sir has access to Lovable → Project Settings → Knowledge.
+- [ ] Lovable MCP connected (recommended) — check with `/mcp`. If missing, offer Sir: `claude mcp add --transport http lovable https://mcp.lovable.dev`, restart, OAuth on first call. Without it, fall back to the manual paste flow throughout.
+- [ ] Without MCP only: Sir has access to Lovable → Project Settings → Knowledge.
 
-If any "no" — pause and tell Sir what's missing.
+If any "no" — pause and tell Sir what's missing. (No Lovable project at all yet? With the MCP connected you can create one via `create_project` — ask Sir first, it spends Lovable credits.)
 
 ## Day-0 order of operations
 
 1. **Lovable scaffolded first** (already done in preflight). CC layers the workflow ON TOP of Lovable's scaffold. Never recreate files Lovable already produced — `package.json`, `vite.config.ts`, `tsconfig.json`, `index.html`, `src/main.tsx`, `src/App.tsx`, `tailwind.config.ts`, `postcss.config.js`, `src/components/ui/`.
 2. **CC installs cclv-specboot** (step 1 below).
 3. **CC fills placeholders** (step 2 below).
-4. **Sir wires Lovable Knowledge + pins files** (step 3 below).
+4. **CC syncs Lovable Knowledge via MCP; Sir pins files** (step 3 below).
 5. **CC writes first LV prompt** (step 6 below).
 
 ## Steps
@@ -95,12 +96,14 @@ Replace `{{PROJECT_NAME}}`, `{{PROJECT_TAGLINE}}`, `{{PROJECT_DOMAIN}}`, `{{PRIM
 
 ### 3. Set up Lovable
 
-Tell Sir to:
+**With the Lovable MCP:** push `control-center/lovable-knowledge.md` yourself via `set_project_knowledge`, then read it back with `get_project_knowledge` to confirm. Then tell Sir to pin `AGENTS.md` and `OWNERSHIP.md` in Lovable's project (so LV reads them on every prompt).
+
+**Without MCP,** tell Sir to:
 
 1. Open Lovable → Project Settings → Knowledge.
 2. Paste the full content of `control-center/lovable-knowledge.md` into the Knowledge field.
 3. Save.
-4. Pin `AGENTS.md` and `OWNERSHIP.md` in Lovable's project (so LV reads them on every prompt).
+4. Pin `AGENTS.md` and `OWNERSHIP.md` in Lovable's project.
 
 ### 4. Set up Supabase env
 
@@ -153,7 +156,7 @@ git commit -m "chore: bootstrap CC/LV/CW workflow via cclv-specboot"
 
 Use the `lv-prompt-writer` skill. Suggested first slice: wire up Supabase auth + create the `profiles` table + (if credits = yes) the `add_credits` RPC + `credits_ledger` table + initial grant on signup.
 
-Save to `control-center/lv-prompts/LV-001-auth-base.md`. Tell Sir: "Paste into Lovable when ready."
+Save to `control-center/lv-prompts/LV-001-auth-base.md`, then send it to LV via `send_message`. (No MCP? Tell Sir: "Paste into Lovable when ready.")
 
 ## Report back to Sir
 
@@ -161,7 +164,7 @@ After bootstrap, cover:
 
 - File tree installed (top-level dirs).
 - Placeholders filled (confirm zero `{{` left).
-- Lovable Knowledge pasted (confirm with Sir).
+- Lovable Knowledge synced via MCP (or pasted — confirm with Sir).
 - Files pinned in Lovable (confirm with Sir).
 - Project-specific decisions recorded in `build-state.md` + `CLAUDE.md`.
 - First LV prompt drafted (or skipped if Sir wants to drive that).

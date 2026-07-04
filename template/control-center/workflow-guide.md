@@ -19,13 +19,18 @@ How CC, LV, and CW collaborate. Concrete worked example below.
    │  CC: contract-writer → lv-prompt-writer                   │  │
    │      │                                                    │  │
    │      ▼                                                    │  │
-   │  Sir pastes prompt into Lovable                           │  │
+   │  CC sends prompt via Lovable MCP send_message             │  │
+   │  (no MCP? Sir pastes it into Lovable)                     │  │
    │      │                                                    │  │
    │      ▼                                                    │  │
-   │  LV executes → writes lv-responses/ OR lv-blockers/       │  │
+   │  LV executes → replies in chat; CC answers questions      │  │
    │      │                                                    │  │
    │      ▼                                                    │  │
-   │  Sir pulls; CC: verify-after-pull → lv-response-reader    │  │
+   │  CC: lv-response-reader (get_message + get_diff)          │  │
+   │      → writes lv-responses/ (or lv-blockers/)             │  │
+   │      │                                                    │  │
+   │      ▼                                                    │  │
+   │  Sir pulls; CC: verify-after-pull                         │  │
    │      │                                                    │  │
    │      ▼                                                    │  │
    │  CC wires frontend ─────────────────────────────────────▶ │  │
@@ -78,32 +83,33 @@ Uses `lv-prompt-writer` skill. Creates `control-center/lv-prompts/LV-product-ima
 - Implementation details (table schema, RLS, idempotency, credit flow).
 - Required secret: `IMAGE_PROVIDER_API_KEY`.
 
-Tells Sir: "Paste into Lovable when ready."
+Sends it to LV via the Lovable MCP (`send_message`).
 
-### Step 4 — Sir pastes into Lovable
+### Step 4 — LV executes
 
-Lovable executes. Eventually pushes to `main`:
+CC polls `get_message`. LV asks one question mid-run ("charge credits before or after the provider call?") — CC answers in-chat. LV pushes to `main`:
 - `supabase/migrations/20260522T140000_add_generated_images.sql`.
 - `supabase/functions/generate-product-image/index.ts`.
 - `supabase/functions/_shared/...` (if extended).
-- `control-center/lv-responses/LV-product-image-gen-response.md`.
 
-### Step 5 — Sir pulls; CC runs verify-after-pull
+### Step 5 — CC processes the reply
+
+Uses `lv-response-reader` skill: reads the final `get_message` reply, pulls `get_diff`, cross-checks. Finds:
+- Files created/modified — match scope ✓.
+- No lane crossings ✓.
+- Contract unchanged ✓.
+- Secret `IMAGE_PROVIDER_API_KEY` required — Sir confirms set in Supabase.
+- One known issue: timeout sometimes returns 504, LV suggests retry-on-client.
+
+Distills all of it into `control-center/lv-responses/LV-product-image-gen-response.md` and commits.
+
+### Step 6 — Sir pulls; CC runs verify-after-pull
 
 ```bash
 bash scripts/verify-after-pull.sh
 ```
 
 Reports: no lane crossings, lint clean, build passes.
-
-### Step 6 — CC reads the LV response
-
-Uses `lv-response-reader` skill. Finds:
-- Files created/modified — match scope ✓.
-- No lane crossings ✓.
-- Contract unchanged ✓.
-- Secret `IMAGE_PROVIDER_API_KEY` required — Sir confirms set in Supabase.
-- One known issue: timeout sometimes returns 504, LV suggests retry-on-client.
 
 ### Step 7 — CC smoke-tests
 

@@ -2,6 +2,27 @@
 
 All notable changes to cclv-specboot. Follows [Keep a Changelog](https://keepachangelog.com).
 
+## [0.3.0] — 2026-07-04
+
+### Changed — Lovable MCP integration (MCP primary, paste fallback)
+
+Lovable now ships an official MCP server (`https://mcp.lovable.dev`). CC talks to LV directly — Sir stops being the courier. Every touched doc keeps a "No MCP?" fallback preserving the original paste flow. File artifacts (`lv-prompts/`, `lv-responses/`) remain the audit trail in both modes.
+
+**The loop:**
+- CC sends LV prompts itself via `send_message`, polls `get_message`, and answers LV's questions in-chat. Unresolvable blockers still go to `lv-blockers/`.
+- CC writes the `lv-responses/` report itself, distilled from LV's chat reply + `get_diff` (paste mode: LV still writes it). Prompt template's "Response Report" section now has MCP/paste variants.
+- kb-sync pushes `control-center/lovable-knowledge.md` via `set_project_knowledge` + readback verify (paste mode: Sir re-pastes).
+- `verify-after-pull.sh` unchanged — git stays the code channel; MCP inspection doesn't replace the local gate.
+
+**Guardrails** (`template/CLAUDE.md` "Lovable MCP channel"): free use of chat/read tools and SELECT-only `query_database`; Sir's explicit go-ahead required for `deploy_project`, `create_project`, and any DDL/DML — schema changes stay in LV's lane via prompts.
+
+**Files:** `template/CLAUDE.md`, `template/AGENTS.md`, `template/docs/standards/base.md` (§1, §4, §10), `template/control-center/` (workflow-guide, lovable-knowledge, lv-prompts/lv-responses TEMPLATEs), skills `lv-prompt-writer` / `lv-response-reader` / `kb-sync` (all bumped to 0.2.0), `README.md`, `INSTALL.md` (new "Connect the Lovable MCP" step), `BOOTSTRAP-PROMPT.md` (MCP in preflight; `create_project` note for greenfield).
+
+### Added
+
+- `docs/superpowers/specs/2026-07-04-lovable-mcp-integration-design.md` — design doc for this release.
+- `template/docs/standards/base.md` §4 — "Strong success criteria let you loop independently" (UBC parity).
+
 ## [0.2.3] — 2026-05-22
 
 ### Added — First reference example (Phase 3 starter)

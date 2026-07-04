@@ -62,7 +62,7 @@ Whoever first creates the path also adds the row in the same commit/prompt:
 - A NEW component in `src/components/`? **CC.**
 - A contract type? **CC.**
 - A hook (not auth)? **CC.**
-- The Lovable Knowledge field content? **CC** writes the canonical copy to `control-center/lovable-knowledge.md`; Sir pastes it into Lovable.
+- The Lovable Knowledge field content? **CC** writes the canonical copy to `control-center/lovable-knowledge.md` and syncs it via the Lovable MCP (no MCP? Sir pastes it into Lovable).
 - A test report? **CW** (writes to `control-center/cw-reports/`).
 
 ## Standards layering

@@ -10,7 +10,7 @@ Running session log. Newest at top. Updated at end of every session that ships c
 **What shipped:**
 - cclv-specboot template installed.
 - Placeholders filled (`{{PROJECT_NAME}}`, etc.).
-- Lovable Knowledge pasted.
+- Lovable Knowledge synced via MCP (or pasted).
 - AGENTS.md + OWNERSHIP.md pinned in Lovable.
 - First LV prompt: auth + credits foundations (status: pending).
 
@@ -20,5 +20,5 @@ Running session log. Newest at top. Updated at end of every session that ships c
 - [ ] Write CW-001 to verify signup flow.
 
 **Lane crossings:** none
-**Lovable Knowledge:** initial paste — Sir confirmed.
+**Lovable Knowledge:** initial sync via MCP (or paste) — confirmed.
 **Notes:** Project initialized via cclv-specboot v0.1.0. See `docs/reports/{{TODAY}}-bootstrap.md` for setup details.

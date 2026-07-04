@@ -84,7 +84,12 @@ For the full three-places model (Lovable env vars vs Supabase secrets vs local `
 
 ## Response report (mandatory)
 
-After every LV prompt, write `control-center/lv-responses/LV-[NAME]-response.md` covering:
+Every LV prompt ends with a response report at `control-center/lv-responses/LV-[NAME]-response.md`. Who writes it depends on the channel — the prompt tells you:
+
+- **MCP mode (default):** CC sent the prompt via the Lovable MCP and distills your chat reply + diff into the report itself. Your job: make the chat reply complete — cover every item below.
+- **Paste mode:** Sir pasted the prompt manually; YOU write the report file.
+
+Either way, the report covers:
 
 - Files created / modified / deleted.
 - Migration filenames + summary.
@@ -96,7 +101,7 @@ After every LV prompt, write `control-center/lv-responses/LV-[NAME]-response.md`
 
 ## When you get stuck
 
-DO NOT GUESS. Write `control-center/lv-blockers/LV-[NAME]-blocker.md` with:
+DO NOT GUESS. If CC sent the prompt via the Lovable MCP, ask your question in the chat reply first — CC answers with a follow-up message. If the exchange doesn't resolve it (or the prompt was pasted manually), write `control-center/lv-blockers/LV-[NAME]-blocker.md` with:
 
 - The prompt you got (filename).
 - What you can't resolve.
