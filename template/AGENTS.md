@@ -115,6 +115,12 @@ CC reads `lv-blockers/` at the start of every session.
 
 ### §1 — Think before coding
 
+Think in proportion to the task's tier:
+- Trivial — the standing rules below; no extended-thinking trigger.
+- Standard — think before coding or writing.
+- Major — ultrathink before coding.
+
+The standing rules:
 - State assumptions explicitly. If multiple interpretations exist, present them.
 - If a simpler approach exists, push back.
 - If something is unclear, do NOT guess. Write to `control-center/lv-blockers/` and stop.

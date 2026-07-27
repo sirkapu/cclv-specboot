@@ -9,9 +9,18 @@ alwaysApply: true
 
 Shared rules for every AI agent touching this repo. Read this BEFORE your agent-specific doc (`CLAUDE.md`, `AGENTS.md`, or your CW brief).
 
+Adapted from [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) (MIT), derived from [Karpathy's observations on LLM coding failures](https://x.com/karpathy/status/2015883857489522876).
+
 ## 1. The four engineering disciplines (non-negotiable)
 
-### §1 — Think before coding (ultrathink)
+### §1 — Think before coding
+
+Think in proportion to the task's tier:
+- Trivial — the standing rules below; no extended-thinking trigger.
+- Standard — think before coding or writing.
+- Major — ultrathink before coding.
+
+These are **task-ceremony** tiers, unrelated to the file-size Tiers in §5. Why tiered rather than unconditional: [the UBC tier-ladder decision](https://github.com/sirkapu/cclv-specboot/blob/main/docs/decisions/2026-07-27-ubc-tier-ladder.md).
 
 Don't assume. Don't hide confusion. Surface tradeoffs.
 

@@ -170,7 +170,12 @@ Max 50 lines per function across all tiers.
 
 ## Engineering discipline (CC adaptation — full text in docs/standards/base.md)
 
-### §1 — Think before coding (ultrathink)
+### §1 — Think before coding
+
+Think in proportion to the task's tier:
+- Trivial — the standing rules below; no extended-thinking trigger.
+- Standard — think before coding or writing.
+- Major — ultrathink before coding.
 
 Don't assume. Don't hide confusion. Surface tradeoffs.
 

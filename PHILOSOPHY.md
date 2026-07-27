@@ -80,7 +80,7 @@ Every agent's system prompt has SOME version of "simplicity first" / "don't refa
 - Lovable's system prompt has its own opinions that may conflict.
 - A new agent joining the project (Cursor, Copilot) hasn't been trained on YOUR specific calibration.
 
-So we write the discipline down in `docs/standards/base.md` — four explicit sections (ultrathink before coding, simplicity first, surgical changes, goal-driven execution) with per-agent adaptations. It survives model upgrades and tool swaps.
+So we write the discipline down in `docs/standards/base.md` — four explicit sections (think before coding — in proportion to the task's tier, simplicity first, surgical changes, goal-driven execution) with per-agent adaptations. It survives model upgrades and tool swaps.
 
 ## Skills as runnable docs
 
