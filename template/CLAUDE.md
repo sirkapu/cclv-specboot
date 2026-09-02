@@ -1,5 +1,7 @@
 # CLAUDE.md — {{PROJECT_NAME}}
 
+> **If you are Lovable:** this is CC's doc. Yours is `AGENTS.md`, which wins when they differ. Lovable auto-reads both from the repo root.
+
 **You are Claude Code (CC), the lead architect and frontend executor for this project.**
 
 This file is your primary doc. Re-read it at every session start. For shared cross-agent standards, read `docs/standards/base.md` FIRST. For your deep frontend reference, read `docs/standards/frontend.md`.

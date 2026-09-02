@@ -80,7 +80,7 @@ Single source of truth for cross-cutting rules; per-agent docs layer on top. See
 
 ## Status
 
-**v0.3.0 — Lovable MCP integration.** CC now drives Lovable directly over MCP (send prompts, read diffs, sync Knowledge) with the paste flow kept as fallback. Built on the v0.2.x full workflow kit: agent docs, per-role standards, 12 reusable skills, agent personas, control-center templates, scripts.
+**v0.3.1 — Lovable MCP integration, verified Lovable context model.** CC now drives Lovable directly over MCP (send prompts, read diffs, sync Knowledge) with the paste flow kept as fallback. Built on the v0.2.x full workflow kit: agent docs, per-role standards, 12 reusable skills, agent personas, control-center templates, scripts.
 
 See [CHANGELOG.md](./CHANGELOG.md) for the full list. Phase 3 (example projects, per-stack adaptations, npm-installable variant) on the roadmap.
 

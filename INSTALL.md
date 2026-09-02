@@ -66,11 +66,15 @@ Restart Claude Code, verify with `/mcp` — a browser OAuth window opens on firs
 2. Paste the full content of `control-center/lovable-knowledge.md`.
 3. Save.
 
-### 6. Pin canonical files in Lovable
+### 6. How Lovable reads your repo (nothing to pin)
 
-In Lovable's project settings, pin these so LV reads them on every prompt:
-- `OWNERSHIP.md`
-- `AGENTS.md`
+Lovable has no "pin" or attach-file feature. On every prompt it automatically reads, from your repo's root: `AGENTS.md` — "always read by the Lovable agent regardless of session length" — and `CLAUDE.md`, alongside project code and connector knowledge. Pushing these files to the branch Lovable syncs from is enough; there's nothing to configure in Lovable's UI.
+
+`OWNERSHIP.md` isn't auto-read on its own — both `AGENTS.md` and `CLAUDE.md` point to it by reference, and it's also linked from Knowledge, so LV reaches it from either path.
+
+Lovable also reads **Knowledge** (project-level and workspace-level) on every message. Each level is capped at **10,000 characters**; when project and workspace Knowledge conflict, project Knowledge wins.
+
+Optional: task-specific instructions that don't belong in Knowledge or AGENTS.md can ship as **Lovable Skills** instead. Anything under `ai-specs/skills/` can be imported into Lovable as a workspace skill — either from a GitHub subdirectory URL that contains a `SKILL.md` file, or via the MCP `create_workspace_skill` tool (admins/owners only). Skills load on demand when a request matches their description, unlike Knowledge, which is always in context.
 
 ### 7. Verify
 
