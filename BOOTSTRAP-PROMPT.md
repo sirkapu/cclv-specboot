@@ -59,7 +59,7 @@ If any "no" — pause and tell Sir what's missing. (No Lovable project at all ye
 1. **Lovable scaffolded first** (already done in preflight). CC layers the workflow ON TOP of Lovable's scaffold. Never recreate files Lovable already produced — `package.json`, `vite.config.ts`, `tsconfig.json`, `index.html`, `src/main.tsx`, `src/App.tsx`, `tailwind.config.ts`, `postcss.config.js`, `src/components/ui/`.
 2. **CC installs cclv-specboot** (step 1 below).
 3. **CC fills placeholders** (step 2 below).
-4. **CC syncs Lovable Knowledge via MCP; Sir pins files** (step 3 below).
+4. **CC syncs Lovable Knowledge via MCP** (nothing to pin — Lovable auto-reads root AGENTS.md and CLAUDE.md) (step 3 below).
 5. **CC writes first LV prompt** (step 8 below).
 
 ## Steps
@@ -96,14 +96,15 @@ Replace `{{PROJECT_NAME}}`, `{{PROJECT_TAGLINE}}`, `{{PROJECT_DOMAIN}}`, `{{PRIM
 
 ### 3. Set up Lovable
 
-**With the Lovable MCP:** push `control-center/lovable-knowledge.md` yourself via `set_project_knowledge`, then read it back with `get_project_knowledge` to confirm. Then tell Sir to pin `AGENTS.md` and `OWNERSHIP.md` in Lovable's project (so LV reads them on every prompt).
+Lovable reads root `AGENTS.md` and `CLAUDE.md` automatically on every prompt — there's nothing to pin. Just push them to the branch Lovable syncs from.
+
+**With the Lovable MCP:** push `control-center/lovable-knowledge.md` yourself via `set_project_knowledge`, then read it back with `get_project_knowledge` to confirm. Knowledge is capped at 10,000 characters — check `wc -c` before syncing.
 
 **Without MCP,** tell Sir to:
 
 1. Open Lovable → Project Settings → Knowledge.
 2. Paste the full content of `control-center/lovable-knowledge.md` into the Knowledge field.
 3. Save.
-4. Pin `AGENTS.md` and `OWNERSHIP.md` in Lovable's project.
 
 ### 4. Set up Supabase env
 
@@ -165,7 +166,7 @@ After bootstrap, cover:
 - File tree installed (top-level dirs).
 - Placeholders filled (confirm zero `{{` left).
 - Lovable Knowledge synced via MCP (or pasted — confirm with Sir).
-- Files pinned in Lovable (confirm with Sir).
+- Confirmed AGENTS.md is on the branch Lovable syncs from (it auto-reads it).
 - Project-specific decisions recorded in `build-state.md` + `CLAUDE.md`.
 - First LV prompt drafted (or skipped if Sir wants to drive that).
 - Suggested next slice.

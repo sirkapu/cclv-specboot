@@ -1,5 +1,7 @@
 # Example: AURA-style bootstrap
 
+> **Historical note (2026-09-02):** this example recommends "pinning" `OWNERSHIP.md` and `AGENTS.md` in Lovable. That feature does not exist. Lovable auto-reads root `AGENTS.md` and `CLAUDE.md` on every prompt — see INSTALL.md §6.
+
 > **This is a project-specific example.** It's the working draft that produced cclv-specboot — an AURA-flavored bootstrap prompt with project-specific decisions baked in (credits system, desktop-first, light Portal/Translate safety).
 >
 > **For the generic, kit-aligned paste-prompt, use [`BOOTSTRAP-PROMPT.md`](../../BOOTSTRAP-PROMPT.md) at the repo root** instead. That one delegates to `bin/install.sh` and leaves project-specific decisions as TBDs.

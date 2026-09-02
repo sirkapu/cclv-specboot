@@ -29,10 +29,26 @@ if [[ ! -d "$TEMPLATE_DIR" ]]; then
     exit 1
 fi
 
-echo "==> Installing cclv-specboot v0.2.0 into $TARGET..."
+echo "==> Installing cclv-specboot v0.3.1 into $TARGET..."
 
-# Copy template content (cp -rn: never overwrite existing files)
-cp -rn "$TEMPLATE_DIR/." "$TARGET/"
+# Copy template content, never overwriting existing files.
+# NOTE: `cp -rn` exits 1 on macOS when it skips an existing file, which under
+# `set -euo pipefail` kills the script right here — chmod, the .gitignore
+# merge, and the .claude/skills/ symlinks below would never run. Use a
+# per-file loop instead so an existing file is just skipped, not a failure.
+COPIED=0; SKIPPED=0
+while IFS= read -r -d '' rel; do
+    rel="${rel#./}"
+    dest="$TARGET/$rel"
+    if [[ -e "$dest" ]]; then
+        SKIPPED=$((SKIPPED+1))
+    else
+        mkdir -p "$(dirname "$dest")"
+        cp "$TEMPLATE_DIR/$rel" "$dest"
+        COPIED=$((COPIED+1))
+    fi
+done < <(cd "$TEMPLATE_DIR" && find . -type f -print0)
+echo "  ✓ Copied $COPIED files, skipped $SKIPPED existing"
 
 # Make scripts executable
 if [[ -d "$TARGET/scripts" ]]; then
@@ -41,7 +57,9 @@ fi
 
 # Merge .gitignore.append into the project's .gitignore (don't overwrite)
 if [[ -f "$TARGET/.gitignore.append" ]]; then
-    if [[ -f "$TARGET/.gitignore" ]]; then
+    if [[ -f "$TARGET/.gitignore" ]] && grep -qxF "# === Appended by cclv-specboot ===" "$TARGET/.gitignore" 2>/dev/null; then
+        echo "  ✓ .gitignore already has cclv-specboot patterns (skipped)"
+    elif [[ -f "$TARGET/.gitignore" ]]; then
         # Only append patterns not already present
         echo "" >> "$TARGET/.gitignore"
         echo "# === Appended by cclv-specboot ===" >> "$TARGET/.gitignore"
@@ -86,6 +104,6 @@ echo "  2. Connect the Lovable MCP (recommended):"
 echo "       claude mcp add --transport http lovable https://mcp.lovable.dev"
 echo "  3. Sync Knowledge: with MCP, ask CC to run the kb-sync skill;"
 echo "     without it, paste control-center/lovable-knowledge.md into Lovable → Settings → Knowledge"
-echo "  4. Pin AGENTS.md and OWNERSHIP.md in Lovable"
+echo "  4. Nothing to pin: Lovable auto-reads root AGENTS.md and CLAUDE.md on every prompt"
 echo "  5. Run: bash scripts/verify-after-pull.sh"
 echo "  6. See INSTALL.md for full setup details"
