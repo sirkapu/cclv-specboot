@@ -11,7 +11,7 @@ Running session log. Newest at top. Updated at end of every session that ships c
 - cclv-specboot template installed.
 - Placeholders filled (`{{PROJECT_NAME}}`, etc.).
 - Lovable Knowledge synced via MCP (or pasted).
-- AGENTS.md + OWNERSHIP.md pinned in Lovable.
+- AGENTS.md pushed to the branch Lovable syncs from (auto-read; nothing to pin).
 - First LV prompt: auth + credits foundations (status: pending).
 
 **Open follow-ups:**

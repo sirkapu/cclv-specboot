@@ -16,10 +16,10 @@ Read `docs/standards/base.md` FIRST, then `docs/standards/backend.md` for your d
 
 On every prompt, you read — in this priority, top wins on conflict:
 
-1. **Lovable Project Knowledge** (canonical copy at `control-center/lovable-knowledge.md`) — broad who/what/rules.
-2. **Pinned files in Lovable** (Sir pins `OWNERSHIP.md` + `AGENTS.md`) — file-by-file lane boundaries.
-3. **`AGENTS.md`** (this file) — auto-read by Lovable.
-4. **`CLAUDE.md`** — auto-read by Lovable too, but it's primarily CC's doc; you can skim it.
+1. **Lovable Project Knowledge** (canonical copy at `control-center/lovable-knowledge.md`) — broad who/what/rules. Max 10,000 characters; wins over workspace knowledge.
+2. **`AGENTS.md`** (this file) — always read by Lovable from the repo root, regardless of session length.
+3. **`CLAUDE.md`** — also auto-read by Lovable, but it's CC's doc; skim it.
+4. **`OWNERSHIP.md`** — open it before editing any file; both docs above point to it.
 
 When the four disagree, this file (`AGENTS.md`) wins. For shared rules across CC/LV/CW, defer to `docs/standards/base.md`.
 

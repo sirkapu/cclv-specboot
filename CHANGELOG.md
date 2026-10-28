@@ -2,6 +2,17 @@
 
 All notable changes to cclv-specboot. Follows [Keep a Changelog](https://keepachangelog.com).
 
+## [0.3.1] — 2026-09-02
+
+### Fixed
+- `bin/install.sh` died on macOS right after the copy step: `cp -n` exits 1 when it skips existing files and the script runs under `set -e`, so chmod, `.gitignore` merge and `.claude/skills/` symlinks never ran. Replaced with a per-file copy loop that reports copied/skipped counts. Banner now says v0.3.1.
+- `template/.gitignore.append` no longer ignores `.lovable/` (Lovable commits `project.json` and Plan-mode archives there) nor `.env` (Lovable Cloud commits it with the publishable key; secrets belong in `.env.local`).
+- Re-running the installer no longer appends the cclv-specboot .gitignore section a second time.
+
+### Changed — Lovable context model, verified against docs.lovable.dev
+- Removed every instruction to "pin" `AGENTS.md`/`OWNERSHIP.md` in Lovable: that feature does not exist. Lovable reads root `AGENTS.md` (always) and `CLAUDE.md` automatically on every prompt, plus project/workspace Knowledge (10,000 chars each, project wins). `template/AGENTS.md` priority list, `template/CLAUDE.md` (new "If you are Lovable" callout), INSTALL.md §6, BOOTSTRAP-PROMPT.md, build-state/roadmap templates, installer next-steps.
+- INSTALL.md §6 notes that `ai-specs/skills/` can be imported into Lovable as workspace skills (GitHub subdirectory URL or MCP `create_workspace_skill`).
+
 ## [0.3.0] — 2026-07-04
 
 ### Changed — Lovable MCP integration (MCP primary, paste fallback)
