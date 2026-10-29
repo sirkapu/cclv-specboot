@@ -3,6 +3,9 @@
 **Date:** 2026-07-04
 **Author:** Fable 5 (main session)
 **Executors:** Opus 4.8 subagents via orchestrated workflow
+
+> **Note (2026-10-28):** Fable 5 and Opus 4.8 are legacy models now (current: Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5). Findings about `.env` handling here were superseded by v0.3.1 and v0.4.0. Kept as the historical charter.
+
 **Status:** Commands the audit-and-fix workflow below
 
 ## Goal

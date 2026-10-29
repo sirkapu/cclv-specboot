@@ -6,9 +6,47 @@ applies_to: [LV]
 
 # Backend Standards
 
-LV's deep reference for Supabase edge functions, migrations, RLS, and auth work. Read `base.md` first.
+LV's deep reference for backend endpoints, migrations, RLS, and auth work. Read `base.md` first.
 
-## 1. Edge function structure
+## 0. Which stack?
+
+`OWNERSHIP.md` names it. **TanStack Start** projects (Lovable's default since 2026-05-13) put backend logic in server functions inside `src/`, so start with §0.1. **Vite + Edge Functions** projects use Deno edge functions in `supabase/functions/`, covered by §1–§3. §4 onward applies to both.
+
+## 0.1 Server functions (TanStack Start)
+
+Server functions live in `*.functions.ts` files; anything that touches secrets or the service-role client lives in `*.server.ts` and is imported lazily inside the handler, so it never reaches the client bundle. This is the shape Lovable's own projects use:
+
+```typescript
+// src/lib/product-image.functions.ts
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { GenerateProductImageResponse } from "@/contracts/product-image";
+
+const Input = z.object({ productId: z.string().uuid(), idempotencyKey: z.string().min(8) });
+
+export const generateProductImage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: z.input<typeof Input>) => Input.parse(input))
+  .handler(async ({ data, context }): Promise<GenerateProductImageResponse> => {
+    const { callImageProvider } = await import("./image-provider.server");
+    // context.userId comes from requireSupabaseAuth. Check credits, check the
+    // idempotency key, call the provider, deduct credits after success.
+    const result = await callImageProvider(data.productId);
+    return { success: true, imageUrl: result.url };
+  });
+```
+
+Rules:
+
+- Import request/response types from `@/contracts/<name>`; never redefine them.
+- Validate every input (`inputValidator` + zod). Return the contract's error variant instead of throwing to the client.
+- Use the auth middleware Lovable generated (`src/integrations/supabase/auth-middleware.ts`) on every function that touches user data. Don't edit generated files.
+- `supabaseAdmin` (`@/integrations/supabase/client.server`) bypasses RLS: use it only after an explicit authorization check.
+- Webhooks and public endpoints go in `src/routes/api/` as server routes and verify the provider's signature first.
+- Same-origin calls don't need CORS. Add CORS headers only on server routes that browsers on other origins call.
+
+## 1. Edge function structure (Vite + Edge Functions)
 
 Every edge function follows this skeleton:
 
@@ -59,7 +97,7 @@ serve(async (req) => {
 });
 ```
 
-## 2. `_shared/` utilities (must use these)
+## 2. `_shared/` utilities (Edge Functions — must use these)
 
 | Utility | Purpose |
 |---------|---------|
@@ -71,7 +109,7 @@ serve(async (req) => {
 
 Never reimplement these inline.
 
-## 3. CORS — non-negotiable
+## 3. CORS — non-negotiable (Edge Functions)
 
 `corsHeaders` is applied to EVERY response, including:
 - Success.
@@ -82,8 +120,10 @@ Missing CORS = browser blocks the response = silent failure for the user.
 
 ## 4. SQL migrations
 
+On Lovable Cloud TanStack Start projects, schema changes are recorded as Drizzle migrations in `drizzle/migrations/` (with `drizzle/schema.ts` and `drizzle.config.ts`, all maintained by Lovable); older migrations stay in `supabase/migrations/`. The rules below (append-only, one concern, RLS in the same migration) apply either way.
+
 ### Filename
-`YYYYMMDDHHMMSS_descriptive_snake_case.sql` (UTC).
+Supabase migrations: `YYYYMMDDHHMMSS_descriptive_snake_case.sql` (UTC). Drizzle names its own files.
 
 ### Pattern
 ```sql
@@ -241,7 +281,7 @@ Both lines are required. `REPLICA IDENTITY FULL` ships the full row in the chang
 
 ## 12. Auth pages frontend
 
-When editing `src/pages/Auth/`:
+When editing auth screens (the auth rows in `OWNERSHIP.md`: `src/routes/auth.tsx`, `auth.*.tsx`, `_authenticated.tsx` on TanStack Start; `src/pages/Auth/` on Vite):
 
 - Use `useNavigate()` for redirects, not `window.location`.
 - Show inline form errors. No alerts.

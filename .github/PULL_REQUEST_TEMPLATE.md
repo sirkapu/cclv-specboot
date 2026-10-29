@@ -38,7 +38,8 @@ Brief bulleted list of what's added/modified/removed.
 - [ ] Followed style in `CONTRIBUTING.md` (file size limits, English-only, lists over paragraphs).
 - [ ] Dogfooded the engineering discipline (`template/docs/standards/base.md` §1–4): minimum code, surgical changes, verifiable outcomes.
 - [ ] Updated `README.md` if surface-level features changed.
-- [ ] If touching `template/docs/standards/base.md`, double-checked `CLAUDE.md` / `AGENTS.md` for drift.
+- [ ] If touching `template/docs/standards/base.md`, double-checked `CLAUDE.md` / `control-center/lovable-knowledge.md` for drift.
+- [ ] If touching an `OWNERSHIP.md` (in `stacks/`) or `scripts/`, ran `spec-lanes.sh` and `verify-after-pull.sh` against a test repo.
 
 ## Related
 

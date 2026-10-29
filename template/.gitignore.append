@@ -1,10 +1,8 @@
-# cclv-specboot — patterns to append to your project's .gitignore
-# After running bin/install.sh, run:
-#   cat .gitignore.append >> .gitignore
-#   rm .gitignore.append
+# cclv-specboot patterns (merged here by bin/install.sh)
 
 # Env files (never commit secrets)
-# .env is committed by Lovable Cloud (publishable key + URL only). Real secrets go in .env.local.
+# .env stays committed: Lovable Cloud writes public values there (Supabase URL + publishable key),
+# and Lovable's docs say not to ignore it. Personal values go in .env.local.
 .env.local
 .env.*.local
 

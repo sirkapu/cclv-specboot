@@ -532,7 +532,12 @@ Modals and Radix Portal components ARE allowed in this project (unlike AURA's ha
 
 The following protocol is canonical here. §20 tasks 7, 8, and 15 reference this section when generating `CLAUDE.md`, `AGENTS.md`, and `cw-briefs/TEMPLATE.md`. If this section changes, those derived docs need to change too.
 
-### §1 — Think before coding (ultrathink)
+### §1 — Think before coding
+
+Think in proportion to the task's tier:
+- Trivial — the standing rules below; no extended-thinking trigger.
+- Standard — think before coding or writing.
+- Major — ultrathink before coding.
 
 **Don't assume. Don't hide confusion. Surface tradeoffs.**
 

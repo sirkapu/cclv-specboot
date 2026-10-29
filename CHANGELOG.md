@@ -2,6 +2,55 @@
 
 All notable changes to cclv-specboot. Follows [Keep a Changelog](https://keepachangelog.com).
 
+## [0.4.0] — 2026-10-28
+
+Research and plan: `docs/superpowers/specs/2026-10-28-kit-refresh-plan.md`.
+
+### Changed — Spec Kit replaces lidr-specboot as the reference point
+- lidr-specboot's repository is gone (404). README and PHILOSOPHY now position the kit against [GitHub Spec Kit](https://github.com/github/spec-kit) (MIT) and point single-agent users there. lidr-specboot stays as an unlinked historical credit.
+- Spec Kit is the optional spec layer: `uv tool install specify-cli` + `specify init --here --integration claude`. New `spec-lanes` skill + `scripts/spec-lanes.sh` split a Spec Kit `tasks.md` into CC and LV tasks from the file paths each task names, and print a scoped `/speckit-implement` call. Stock `/speckit-implement` runs every task, LV's included. `OWNERSHIP.md` gains `.specify/**` and `specs/**` rows.
+
+### Changed — Lovable's TanStack Start scaffold gets its own lanes
+- Lovable has scaffolded TanStack Start since 2026-05-13: server functions (`*.functions.ts`), server-only modules (`*.server.ts`), `src/routes/`, Drizzle migrations in `drizzle/migrations/` (since 2026-10-07). The old lane split (CC owns `src/**`, LV owns `supabase/**`) no longer matched where LV writes code.
+- New `stacks/` directory with per-stack `OWNERSHIP.md`, `cc-stack.md` and `lv-lanes.md` for `tanstack-start` and `vite-edge`. `bin/install.sh` detects the stack (override `--stack`) and inserts the stack sections into `CLAUDE.md` and `lovable-knowledge.md`. `template/OWNERSHIP.md` moved into `stacks/`.
+- On TanStack Start, LV's server functions import `@/contracts/*` directly; pasting contracts verbatim is only for Deno edge functions. `backend.md` §0.1 adds the server-function pattern Lovable's projects use. `frontend.md`, `base.md` naming, contract docs, the LV prompt and response templates, and the personas are stack-aware.
+
+### Changed — `AGENTS.md` is a routing block, not LV's doc
+- Nearly every coding agent reads the root `AGENTS.md` (Codex, Cursor, Copilot, Antigravity, Devin, Jules, Zed, opencode, Cline), so "You are Lovable (LV)" there turned them all into LV. And Lovable ships its own `AGENTS.md` and appends rules to it, so the installer's skip-existing rule meant the kit's file was never installed on Lovable projects.
+- `template/AGENTS.md` is now a role-neutral `CCLV:BEGIN/END` block: Lovable's agent is LV, every other agent is CC, CW is a subagent. The installer inserts it after Lovable's `LOVABLE:END` marker (or at the top) and never adds it twice. `OWNERSHIP.md` marks `AGENTS.md` as CC+LV: Lovable owns everything outside the block.
+- LV's identity, lanes and rules moved into `control-center/lovable-knowledge.md` (Lovable's Project Instructions, formerly "Knowledge"; about 5.6k of 10k characters). `CLAUDE.md` imports `@AGENTS.md`, since Claude Code doesn't load `AGENTS.md` when a `CLAUDE.md` exists.
+- Removed `template/codex.md`: no tool reads it (Codex reads `AGENTS.md`). `GEMINI.md` and `.cursor/rules/main.mdc` no longer claim "only Lovable reads AGENTS.md" and point to `OWNERSHIP.md` instead of hardcoded paths.
+
+### Fixed — Lovable MCP loop (checked against the live tool schemas)
+- The kit said to "poll `get_message` until done" and answer LV with `send_message`. `get_message`'s top-level status never becomes terminal (read `response.status`), and a `send_message` during an approval pause rejects LV's pending tool. `CLAUDE.md`, `lv-prompt-writer`, `lv-response-reader`, `workflow-guide.md` and `base.md` now say: `send_message` blocks up to 600 s; `awaiting_input` with an `awaiting_input` object → Sir decides → `respond_to_approval`; secure-form secrets and credit check-ins → the Lovable editor. Major slices start with `plan_mode: true`.
+- MCP guardrails classify more tools (`respond_to_approval`, `remix_project`, `enable_database`, `add_connector`, workspace knowledge/skills as ask-first; `list_edits`, `get_database_status` and others as free).
+- CC pulls (`git pull --ff-only`) and runs `verify-after-pull.sh` itself; the response report is committed after the pull.
+
+### Fixed — lane gate never fired
+- `verify-after-pull.sh` matched the commit author against "lovable", but Lovable's commits are authored `gpt-engineer-app[bot]` in raw `git log` (`lovable-dev[bot]` on GitHub). It now recognises those identities or the `X-Lovable-Edit-ID` trailer (`LOVABLE_AUTHOR_REGEX` overrides), audits exactly what was pulled (`ORIG_HEAD..HEAD`), attributes merge commits only for what they resolved, looks every file up in `OWNERSHIP.md` via the new `scripts/lib/lanes.sh` (most specific row wins), flags Lovable edits inside the CCLV block, lists unmapped files, and refuses committed `.env.local`. Runs on macOS's bash 3.2; uses bun when the project does.
+
+### Changed — Claude models and Claude Code
+- Tier ladder: the three ratified lines stay verbatim; `base.md` §1 adds an operational mapping (Trivial/Standard = default or `/effort low`; Major = `/effort high`/`xhigh` or a typed `ultrathink`; for LV, Major = `plan_mode` first). On the 5.5 models thinking is always on, and `ultrathink` does nothing when it's only written in a file.
+- INSTALL.md prerequisites: Claude Code v2.1.293+ (5.5 aliases), v2.1.311+ for `ultrathink` → `xhigh`.
+- CW runs as a Claude Code subagent: the installer links `.claude/agents/cw-reviewer.md` (`model: sonnet`, `effort: high`). Cowork is cloud-only since 2026-10-06 and can't reach a local dev server.
+
+### Changed — env and secrets
+- `base.md` §15 rewritten for Lovable Cloud: `.env` is committed with public values (`VITE_SUPABASE_PUBLISHABLE_KEY` replaces `ANON_KEY` in `.env.example`); secrets live in the Lovable editor (or Supabase for your own project); never copy `.env.example` over your env (an empty `VITE_SUPABASE_URL=` in `.env.local` breaks the app). `code-auditing` checks what `.env` holds instead of flagging that it exists.
+
+### Added
+- `VERSION` file; the installer stamps `.cclv-specboot-version` into projects.
+- `stacks/README.md`, `template/scripts/lib/lanes.sh`, `template/scripts/spec-lanes.sh`, `template/ai-specs/skills/spec-lanes/`.
+- `workflow-guide.md`: "With Spec Kit" and "Paste mode" sections; the worked example now follows the TanStack Start loop.
+
+### Also in this release (previously unreleased)
+- `53d4398` — §1 thinking effort conditioned on task tier, with the decision record `docs/decisions/2026-07-27-ubc-tier-ladder.md`.
+
+### Migrating a v0.3.x project
+1. Re-run `bin/install.sh` (pass `--stack` if detection is wrong): it adds the CCLV block to `AGENTS.md`, the new scripts and the `spec-lanes` skill, and leaves your files alone.
+2. Replace your old `AGENTS.md` content (the "You are Lovable (LV)" lane sheet) with the CCLV block, and move anything project-specific into `control-center/lovable-knowledge.md`. Then run kb-sync.
+3. Diff your `OWNERSHIP.md`, `CLAUDE.md` and `scripts/verify-after-pull.sh` against `stacks/<stack>/` and `template/`. The new scripts need `OWNERSHIP.md` in the table format described at its top.
+4. Delete `codex.md`.
+
 ## [0.3.1] — 2026-09-02
 
 ### Fixed

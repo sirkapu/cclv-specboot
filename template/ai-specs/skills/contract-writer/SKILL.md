@@ -10,13 +10,13 @@ version: 0.1.0
 
 ## When to use
 
-Before writing any LV prompt that involves a new edge function OR a shape change to an existing one. The contract is the source of truth; everything else (LV prompt, frontend hook) references it.
+Before writing any LV prompt that involves a new backend endpoint (server function, server route or edge function) OR a shape change to an existing one. The contract is the source of truth; everything else (LV prompt, frontend hook) references it.
 
 ## Procedure
 
 ### Step 1 — Decide the filename
 
-`src/contracts/<edge-function-name>.ts`. The contract filename matches the edge function name (kebab-case).
+`src/contracts/<endpoint-name>.ts`. The contract filename matches the endpoint name, kebab-case (`product-image.ts` for `product-image.functions.ts`, or `generate-foo.ts` for the `generate-foo` edge function).
 
 ### Step 2 — Decide if failure is user-visible
 
@@ -93,7 +93,7 @@ Commit the contract file BEFORE writing the LV prompt. Commit message: `feat(con
 
 ### Step 6 — Use in the LV prompt
 
-In your LV prompt (per the `lv-prompt-writer` skill), paste the contract verbatim under `## Contract Types`:
+Commit and push the contract first. Then, in your LV prompt (per the `lv-prompt-writer` skill): on TanStack Start, tell LV to import it from `@/contracts/<name>` and quote only changed types; on Vite + Edge Functions, paste it verbatim under `## Contract Types`:
 
 ````markdown
 ## Contract Types
@@ -106,7 +106,8 @@ export type GenerateFooResponse = ...
 
 ## Checklist
 
-- [ ] Filename matches the edge function name.
+- [ ] Filename matches the endpoint name.
+- [ ] Committed and pushed before the LV prompt is sent.
 - [ ] Discriminated union if failure is user-visible.
 - [ ] Type guards exported (`isFooSuccess`, `isFooError`).
 - [ ] Credit cost constant exported.

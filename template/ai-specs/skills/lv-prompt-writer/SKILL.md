@@ -1,9 +1,9 @@
 ---
 name: lv-prompt-writer
-description: Use when CC needs to write a Lovable (LV) prompt for backend work — new edge function, new migration, RLS change, secrets setup, schema migration. Triggers when CC says "write an LV prompt", "ship X to backend", "need an edge function for", "Lovable needs to", or detects that a planned slice requires a backend deliverable.
+description: Use when CC needs to write a Lovable (LV) prompt for backend work — new server function or edge function, new migration, RLS change, secrets setup, schema migration — or to hand Spec Kit's LV-lane tasks to Lovable. Triggers when CC says "write an LV prompt", "ship X to backend", "need a server function for", "need an edge function for", "Lovable needs to", "send the LV tasks", or detects that a planned slice requires a backend deliverable.
 applies_to: [CC]
 author: cclv-specboot
-version: 0.2.0
+version: 0.3.0
 ---
 
 # lv-prompt-writer
@@ -16,96 +16,72 @@ CC needs to delegate backend work to Lovable. Use this skill BEFORE writing the 
 
 ### Step 1 — Confirm the work is in LV's lane
 
-LV owns: edge functions, migrations, RLS, auth pages, Supabase client wiring, build config.
-LV does NOT own: components (except `ui/`), contracts, hooks (except auth), styles, control-center.
+`OWNERSHIP.md` decides; the most specific row wins. On TanStack Start that's server functions (`*.functions.ts`), server-only modules (`*.server.ts`), `src/routes/api/`, `drizzle/`, auth screens. On the Vite + Edge Functions stack it's `supabase/functions/`, `supabase/migrations/` and auth pages. Either way LV also owns `src/components/ui/`, `src/integrations/supabase/` and build config.
 
-If the work touches CC-owned files, do it yourself. If hybrid (e.g. new edge function + new hook to call it), split into two phases: LV ships backend; you wire the hook after.
+If the work touches CC-owned files, do it yourself. If hybrid (e.g. a new server function + a hook to call it), split it: LV ships the backend; you wire the hook.
+
+**With Spec Kit:** run `bash scripts/spec-lanes.sh` (spec-lanes skill). The LV task IDs are this prompt's scope. MIXED tasks must be split first.
 
 ### Step 2 — Update the contract FIRST
 
-If the new edge function returns or accepts user-facing data:
+If the endpoint returns or accepts user-facing data:
 
-1. Open or create `src/contracts/<edge-function-name>.ts`.
+1. Open or create `src/contracts/<endpoint-name>.ts`.
 2. Define `Request` and `Response` types.
 3. If failure modes are user-visible, define a discriminated union with `success: true | false`.
 4. Export type guards: `isFooSuccess(payload)`, `isFooError(payload)`.
 5. Export constants: `FOO_CREDITS`, `FOO_TIMEOUT_MS`, etc.
-6. Commit the contract file BEFORE writing the prompt.
+6. Commit **and push** the contract before sending the prompt. Lovable reads the synced branch, so an unpushed contract doesn't exist for LV.
 
 ### Step 3 — Use the template
 
-````markdown
-# LV-[NAME]: [one-line title]
+`control-center/lv-prompts/TEMPLATE.md` is the template. Key sections:
 
-## Context
-What exists today. What this builds on. Link to relevant files.
-
-## Scope
-Numbered list of exact deliverables.
-
-## Contract Types
-```typescript
-// PASTE FROM src/contracts/[name].ts VERBATIM
-```
-
-## Implementation Details
-- Table names, column types.
-- Edge function name (kebab-case-verb-noun).
-- Auth model (RLS policy, impersonation if applicable).
-- Idempotency key strategy.
-- Credit cost + when charged (check before, deduct after success).
-- Error codes + user-facing messages.
-- Secrets required (e.g. `OPENAI_API_KEY` — Sir sets in Supabase before deploy).
-
-## Rules
-- CORS on ALL responses.
-- Use `_shared/` utilities.
-- Credits via `add_credits` RPC only.
-- Idempotency keys on mutations.
-- `REPLICA IDENTITY FULL` + realtime publication on realtime tables.
-- Migration filename: `YYYYMMDDHHMMSS_descriptive_snake_case.sql`.
-
-## Do Not Modify (CC-owned)
-Read `OWNERSHIP.md`. Specifically: `src/components/**` (except `ui/`), `src/pages/**` (except `Auth/`), `src/contracts/**`, `src/hooks/**` (except `useAuth`), `src/styles/**`, `CLAUDE.md`, `OWNERSHIP.md`, `AGENTS.md`, `control-center/**` (except writing into `lv-responses/` and `lv-blockers/`), `scripts/**`.
-
-## Response Report
-This prompt was sent via the Lovable MCP. In your chat reply, cover every item in AGENTS.md "Response report" — CC distills it into `control-center/lv-responses/LV-[NAME]-response.md`. If anything is unclear, ASK in your reply before building.
-<!-- Paste mode instead: "Write control-center/lv-responses/LV-[NAME]-response.md per AGENTS.md 'Response report' section." -->
-
-
-## Testing Checklist
-- [ ] Specific test 1
-- [ ] Specific test 2
-````
+- **Contract Types.** Depends on the stack:
+  - **TanStack Start:** name the file (`src/contracts/<name>.ts`) and tell LV to import from `@/contracts/<name>`. Quote only the types this slice adds or changes.
+  - **Vite + Edge Functions:** paste the contract **verbatim**, since Deno can't import it.
+- **Implementation Details.** Table names, column types; the server function or edge function name; auth model (RLS policy, impersonation if applicable); idempotency strategy; credit cost and when it's charged; error codes and user-facing messages; secrets required (LV asks for them through Lovable's secure input).
+- **Spec Kit tasks** (if used). The LV task IDs and lines from `specs/NNN-*/tasks.md`, plus links to `specs/NNN-*/spec.md` and `plan.md`.
+- **Slice-specific rules only.** LV's standing rules and lane list are already in its Project Instructions; don't repeat them.
+- **Reply checklist.** Point at "Reply checklist" in LV's instructions. In paste mode, ask LV to write the response file too.
 
 ### Step 4 — Save, then send via the Lovable MCP
 
-Save to `control-center/lv-prompts/LV-[NAME].md` (audit trail — always, even in MCP mode). Then send the prompt body to LV with `send_message`.
+Save to `control-center/lv-prompts/LV-[NAME].md` (audit trail — always, even in MCP mode).
 
-**No MCP connected?** Tell Sir: "Paste this into Lovable when ready" — and swap the prompt's Response Report section to paste mode (LV writes the file itself).
+- **Major or ambiguous slice:** send it first with `plan_mode: true`. LV plans without editing code; settle open questions in that thread. Then send a short build message ("Build the agreed plan for LV-[NAME]"). Plan turns cost credits too, so skip planning for routine slices.
+- **Otherwise:** send the prompt body with `send_message`.
 
-### Step 5 — Poll and converse
+**No MCP connected?** Tell Sir: "Paste this into Lovable when ready", and say in the prompt that LV must write its own response file.
 
-Poll `get_message` until LV finishes. If LV asks a question, answer with a follow-up `send_message` — don't let it guess. When done, hand off to the `lv-response-reader` skill (reads the reply + `get_diff`, writes the response report).
+### Step 5 — Handle the result
 
-Do not start frontend work that depends on the new edge function until the response report is in `control-center/lv-responses/`. If you need to start in parallel, mock the contract response — but flag it loudly in your `build-state.md` entry so the mock gets removed when the real endpoint is live.
+`send_message` blocks until LV finishes (up to 600 s). Act on the result as set out in CLAUDE.md "Lovable MCP channel":
+
+- Timed out (`in_progress`): poll `get_message` with the returned `message_id` and `thread_id` until `response.status` is `completed`, `stopped`, `error` or `awaiting_input`.
+- `completed`: hand off to `lv-response-reader`. If LV asked a question in its reply, answer it with a new `send_message`.
+- `stopped` or `error`: read what LV did, then re-send a narrower prompt.
+- `awaiting_input` with an `awaiting_input` object: show Sir the `tool_id` and `params`, then call `respond_to_approval` with Sir's decision. **Never** send a new message over a pause: that rejects LV's pending tool.
+- `requires_secure_form` or a credit check-in: send Sir to `editor_url`.
+
+While LV builds, you can work on your own lane against the pushed contract (send with `wait: false` if you want the turn back immediately). Don't merge frontend that depends on the new endpoint until `lv-response-reader` and `verify-after-pull` pass. If you mock the response meanwhile, flag it loudly in `build-state.md` so the mock is removed later.
 
 ## Checklist (tick before sending the prompt)
 
-- [ ] Work is in LV's lane (or hybrid is split into phases).
-- [ ] Contract file in `src/contracts/` is updated/created and committed.
-- [ ] Contract types are pasted into the prompt verbatim.
+- [ ] Work is in LV's lane per `OWNERSHIP.md` (or hybrid is split; Spec Kit MIXED tasks split).
+- [ ] Contract file in `src/contracts/` is updated, committed **and pushed**.
+- [ ] Contract referenced by path (TanStack Start) or pasted verbatim (Edge Functions).
 - [ ] Implementation Details lists every secret needed.
-- [ ] "Do Not Modify" section is explicit.
 - [ ] Testing Checklist has concrete cases (not "test it works").
 - [ ] Prompt saved to `control-center/lv-prompts/LV-[NAME].md`.
-- [ ] Sent via `send_message` (or handed to Sir to paste, with the Response Report section in paste mode).
+- [ ] Sent via `send_message` (`plan_mode` first if Major), or handed to Sir to paste.
 
 ## Common failure modes
 
 | Symptom | Fix |
 |---------|-----|
-| LV ships an endpoint with a different shape than the contract | The contract wasn't pasted verbatim. Re-paste, write a follow-up prompt to align. |
+| LV ships an endpoint with a different shape than the contract | The contract wasn't pushed, or (Edge Functions) wasn't pasted verbatim. Push or re-paste, then send a follow-up prompt to align. |
 | LV asks "what should the table name be?" | You skipped Implementation Details. Be explicit. |
-| LV silently changed the shape mid-implementation | LV's response report should have flagged. If not, treat as lane crossing — write a hotfix prompt. |
+| LV silently changed the shape mid-implementation | LV's reply should have flagged it. If not, treat it as a lane crossing and write a hotfix prompt. |
+| LV's migration or tool call was rejected for no reason | A `send_message` went out while LV was paused. Answer pauses with `respond_to_approval`. |
 | You discover mid-build that the contract is wrong | Update the contract file first, then write a follow-up LV prompt. Never just patch the frontend to match what LV shipped. |

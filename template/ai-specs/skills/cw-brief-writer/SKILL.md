@@ -1,6 +1,6 @@
 ---
 name: cw-brief-writer
-description: Use when CC needs to hand off a feature to CW (QA). Triggers when CC says "write a CW brief", "QA this", "hand this to Cowork", or after shipping a user-facing flow that needs testing.
+description: Use when CC needs to hand off a feature to CW (QA). Triggers when CC says "write a CW brief", "QA this", "hand this to CW", or after shipping a user-facing flow that needs testing.
 applies_to: [CC]
 author: cclv-specboot
 version: 0.1.0
@@ -103,9 +103,11 @@ For each golden path, write at least one edge case. Examples:
 
 Don't let CW guess. Per case, declare the severity if it fails. This makes triage downstream much faster.
 
-### Step 6 — Save + ping Sir
+### Step 6 — Save + run CW
 
-Save to `control-center/cw-briefs/CW-[NAME].md`. Tell Sir: "CW brief ready. Open a second Claude session on branch `qa/CW-[NAME]` and paste the brief."
+Save to `control-center/cw-briefs/CW-[NAME].md`. Then run the `cw-reviewer` subagent on it: "Run CW on `control-center/cw-briefs/CW-[NAME].md`." CW runs in its own context, writes only into `control-center/cw-reports/`, and returns a short summary.
+
+If the brief needs committed test fixtures, run CW with `isolation: worktree` on a `qa/CW-[NAME]` branch instead, and merge the report back afterwards.
 
 ### Step 7 — Wait for the report
 

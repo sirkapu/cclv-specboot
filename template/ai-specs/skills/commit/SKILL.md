@@ -50,10 +50,10 @@ git restore --staged <file>
 
 Scope is the area touched. Common scopes:
 
-- `(app)` — `src/pages/App/`
+- `(routes)` — `src/routes/` (TanStack Start) or `src/pages/` (Vite)
 - `(contracts)` — `src/contracts/`
 - `(control-center)` — `control-center/`
-- `(supabase)` — edge functions, migrations (LV's prefix mostly)
+- `(backend)` — server functions, edge functions, migrations (LV's prefix mostly)
 - `(deps)` — package.json changes
 - `(qa)` — QA branch test fixtures (CW only)
 

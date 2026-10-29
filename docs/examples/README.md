@@ -8,6 +8,8 @@ Reference examples of project-specific customizations of the cclv-specboot kit. 
 |---------|---------------------|
 | [`aura-style-bootstrap.md`](./aura-style-bootstrap.md) | AURA-flavored paste-prompt with credits system, desktop-first, light Portal/Translate safety baked in. Shows the §19 "Project-Specific Patterns" section in action. |
 
+> **Historical (2026-06/07).** `aura-style-bootstrap.md` predates the Lovable MCP (v0.3.0), Lovable's TanStack Start scaffold and the AGENTS.md routing block (v0.4.0). Its advice to pin files, its LV-only `AGENTS.md` and its Vite/edge-function lanes are kept as history; its §1 was later patched to the tier ladder, so it isn't a verbatim original either. Use `BOOTSTRAP-PROMPT.md` for current setup.
+
 ## How to use these
 
 - **Skim before customizing your own.** Examples make the abstract patterns concrete.

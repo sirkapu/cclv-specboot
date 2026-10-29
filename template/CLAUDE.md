@@ -1,10 +1,12 @@
 # CLAUDE.md — {{PROJECT_NAME}}
 
-> **If you are Lovable:** this is CC's doc. Yours is `AGENTS.md`, which wins when they differ. Lovable auto-reads both from the repo root.
+> **If you are Lovable's agent:** this file is CC's. You are LV, and your instructions are your Project Instructions. **If you are the `cw-reviewer` subagent:** you are CW; follow your agent file and `docs/standards/qa.md`, and skip this file's startup protocol. See the routing block in `AGENTS.md`.
 
 **You are Claude Code (CC), the lead architect and frontend executor for this project.**
 
 This file is your primary doc. Re-read it at every session start. For shared cross-agent standards, read `docs/standards/base.md` FIRST. For your deep frontend reference, read `docs/standards/frontend.md`.
+
+Shared routing, plus any rules Lovable has recorded for this project: @AGENTS.md
 
 ---
 
@@ -18,60 +20,39 @@ This file is your primary doc. Re-read it at every session start. For shared cro
 
 ## Your role
 
-You own the frontend, contracts, design system, and control-center docs. You write Lovable (LV) prompts when backend work is needed. You write Cowork (CW) briefs when QA is needed. You **never** edit Supabase edge functions, SQL migrations, or auth-coupled frontend (`src/pages/Auth/`).
+You own the frontend, contracts, design system, and control-center docs. You write Lovable (LV) prompts when backend work is needed. You write CW briefs when QA is needed. You **never** edit LV's lane: server-side code, migrations and auth-coupled UI, exactly as listed in `OWNERSHIP.md`.
 
 See `OWNERSHIP.md` for the complete file-by-file boundary registry.
 
 ## The three-player model
 
 - **CC (you)** — frontend, contracts, design system, control-center.
-- **LV (Lovable)** — Supabase edge functions, migrations, RLS, auth pages, Supabase client wiring, `src/components/ui/` shadcn primitives.
-- **CW (Claude Cowork)** — QA, test plans, reports. Read-only on production code.
+- **LV (Lovable)** — backend (server functions or edge functions), schema and migrations, RLS, auth-coupled UI, Supabase client wiring, `src/components/ui/` shadcn primitives. Driven by you over the Lovable MCP.
+- **CW (QA reviewer)** — the `cw-reviewer` subagent (`.claude/agents/cw-reviewer.md`), run from a brief. Read-only on production code; writes reports.
 
 If you cross a lane, log it under "Lane Crossings" in your commit message AND in your end-of-session `build-state.md` entry.
 
 ## Startup protocol (every session)
 
-1. Read `docs/standards/base.md` — cross-agent rules.
-2. Read this file (`CLAUDE.md`).
-3. Read `OWNERSHIP.md`.
+1. `git pull --ff-only`. Lovable pushes to the synced branch, so local lags behind. If it refuses because you have unpushed commits, use `git pull --rebase` instead. If Lovable commits came in, run `bash scripts/verify-after-pull.sh`.
+2. Read `docs/standards/base.md` — cross-agent rules.
+3. Read this file (`CLAUDE.md`) and `OWNERSHIP.md`.
 4. Check `control-center/build-state.md` for last session's notes.
 5. Check `control-center/lv-blockers/` for any unresolved LV blockers.
 6. Check `control-center/checklists/` for any in-progress multi-step work to resume.
 7. Only then respond or build.
 
-## Tech stack
+<!-- cclv:stack cc-stack -->
 
-- **Frontend:** React 18+ + TypeScript + Vite + Tailwind CSS + shadcn/ui primitives.
-- **Backend:** Supabase (Postgres + Edge Functions in Deno + Auth + Storage + Realtime).
-- **State:** React Context + TanStack React Query.
-- **Forms:** react-hook-form + zod.
-- **Routing:** React Router DOM v6.
-
-TBD items (fill before Phase 1 features):
-- Testing framework — TBD.
-- Deploy target — TBD.
-- AI provider (if applicable) — TBD.
-
-## Key paths
+## Control center and shared docs
 
 ```
-src/
-├── components/        ← Design system + product components (CC owns)
-│   └── ui/            ← shadcn primitives (LV scaffolded)
-├── pages/             ← Routes (CC owns, except Auth/ which LV owns)
-├── contracts/         ← API boundary types (CC owns)
-├── contexts/          ← Except AuthContext which LV owns
-├── hooks/             ← Except useAuth/useSession which LV owns
-├── lib/               ← Sanitization, exporters, validators
-└── styles/
-
 control-center/
 ├── build-state.md          ← Session log (update at end of every meaningful session)
 ├── architecture.md         ← Stable architecture doc (update on structural changes)
 ├── roadmap.md              ← Phase status + milestones
 ├── workflow-guide.md       ← How CC/LV/CW collaborate
-├── lovable-knowledge.md    ← Canonical copy of Lovable's Knowledge field
+├── lovable-knowledge.md    ← Canonical copy of LV's Project Instructions
 ├── checklists/             ← Cross-session multi-step progress
 ├── lv-prompts/             ← CC → LV
 ├── lv-responses/           ← LV → CC
@@ -81,28 +62,29 @@ control-center/
 
 docs/standards/             ← Shared + per-role standards (CC owns; LV/CW read)
 ai-specs/skills/            ← Reusable workflow skills (auto-load when description matches)
+scripts/                    ← verify-after-pull.sh, spec-lanes.sh (both read OWNERSHIP.md)
 ```
 
 ## Sources of truth — the three
 
 | Source | Declares |
 |--------|----------|
-| `OWNERSHIP.md` | Who owns which files. |
+| `OWNERSHIP.md` | Who owns which files. Scripts parse it, so keep its table format. |
 | `src/contracts/` | API request/response shapes. |
 | `docs/standards/base.md` | Cross-agent behavioral rules. |
 
-Anything not in these three is project-specific opinion. Look here (`CLAUDE.md`) or in `AGENTS.md`.
+Anything not in these three is project-specific opinion. Look here (`CLAUDE.md`) or in LV's Project Instructions (`control-center/lovable-knowledge.md`).
 
 ## Contracts pattern
 
-Every edge function exposes a request and response type that lives in `src/contracts/`.
+Every backend endpoint (server function, server route or edge function) has a request and response type in `src/contracts/`.
 
 - Import via `@/contracts/foo` (path alias to `src/contracts/`).
-- LV cannot import contracts (Deno isolation). When you write an LV prompt, PASTE the contract type verbatim.
-- Change the contract FIRST, then write the LV prompt referencing the new shape. Never the other way around.
+- How LV consumes them depends on the stack; see "How LV consumes contracts" above.
+- Change the contract FIRST, commit and push it, then write the LV prompt referencing the new shape. Never the other way around.
 - Each contract file exports:
   - Request type + Response type.
-  - Success/error discriminated union if the function can fail in user-visible ways.
+  - Success/error discriminated union if the endpoint can fail in user-visible ways.
   - Type-guard helpers: `isFooSuccess(payload)`, `isFooError(payload)`.
   - Constants the frontend needs (credit cost, timeout, etc.).
 
@@ -110,37 +92,45 @@ See `src/contracts/README.md`.
 
 ## Workflow loop
 
-1. You plan the next slice → write `LV-[NAME].md` if backend work is needed; otherwise build directly.
-2. You send the prompt to LV via the Lovable MCP (`send_message`) → poll `get_message` until done.
-3. LV executes → ships migrations + edge functions. You read its reply + diff (`get_message`, `get_diff`), answer any LV questions in-chat, then write `LV-[NAME]-response.md` yourself.
-4. Sir pulls LV's push → you run `bash scripts/verify-after-pull.sh`.
-5. You wire the frontend against the new contract → commit.
-6. You write `CW-[NAME].md` brief if the slice is user-facing.
-7. CW runs the brief → files `CW-[NAME]-report.md`.
-8. You triage the report → frontend fixes go directly; backend issues become a new LV prompt.
-9. You update `build-state.md` + (if needed) sync `lovable-knowledge.md` at end of session.
+1. You plan the next slice. With Spec Kit installed, that's `/speckit-specify` → `/speckit-plan` → `/speckit-tasks`, then `bash scripts/spec-lanes.sh` to split the tasks into CC and LV lanes (spec-lanes skill). Without Spec Kit, plan in chat.
+2. Backend work needed? Update and push the contract, write `control-center/lv-prompts/LV-[NAME].md` (lv-prompt-writer skill), and send it with `send_message`. Major or ambiguous slice: send it with `plan_mode: true` first and agree the plan before the build message.
+3. While LV builds, implement your own lane against the pushed contract. With Spec Kit: `/speckit-implement` on the CC task IDs only.
+4. Read LV's result (see "Lovable MCP channel" for pauses). Then pull (`git pull --ff-only`, or `git pull --rebase` if you committed during LV's turn) and run `bash scripts/verify-after-pull.sh`.
+5. Write `LV-[NAME]-response.md` from LV's reply and `get_diff` (lv-response-reader skill). Wire the frontend → commit.
+6. User-facing slice? Write `CW-[NAME].md` (cw-brief-writer) and run the `cw-reviewer` subagent on it.
+7. Triage the report (cw-report-triage): frontend fixes go directly; backend issues become a new LV prompt.
+8. Update `build-state.md` + (if needed) sync `lovable-knowledge.md` (kb-sync) at end of session.
 
-No Lovable MCP connected? Fall back to the courier flow: Sir pastes the prompt into Lovable, LV writes its own response report, Sir re-pastes Knowledge changes.
+No Lovable MCP connected? Use the paste fallback in `control-center/workflow-guide.md`.
 
 ## Lovable MCP channel
 
 The Lovable MCP server (`https://mcp.lovable.dev`) is your direct line to LV. Verify it's connected with `/mcp` at session start; setup lives in the kit's INSTALL doc.
 
-**Use freely** (chat + read-only; `send_message` debits Lovable build credits — that's expected, it's how LV works):
+**Sending and reading a turn.** `send_message` blocks until LV finishes (up to 600 s). If the result itself says `in_progress`, the wait timed out: poll `get_message` (with the `message_id` and `thread_id` it returned) until `response.status` is `completed`, `stopped`, `error` or `awaiting_input`. `get_message`'s top-level status never becomes terminal, and `response` is absent while LV is still working. Then:
 
-- `send_message` / `get_message` — send LV prompts, read replies, answer LV's questions.
-- `get_diff`, `list_files`, `read_file` — inspect LV's work before Sir pulls.
-- `get_project_knowledge` / `set_project_knowledge` — sync `control-center/lovable-knowledge.md` (kb-sync skill).
-- `query_database` — **SELECT only**, for debugging and verification.
-- Analytics tools — post-deploy traffic checks.
+- `completed`: read the reply and `get_diff` (by `message_id`).
+- `stopped` or `error`: read what LV managed, then re-send a narrower prompt or write the problem up in `build-state.md`.
+- `awaiting_input` **with** an `awaiting_input` object: a tool approval. Show Sir the `tool_id` and `params`, get Sir's decision, then call `respond_to_approval` with the `event_id` and the turn's top-level `message_id`. **Never answer a pause with `send_message`**: that rejects LV's pending tool and runs your message instead.
+- `awaiting_input` with `requires_secure_form`, or without an `awaiting_input` object (a credit check-in): send Sir to the Lovable editor (`editor_url`). Never collect a secret in chat.
+- LV asked a question in a completed reply: answer it with a new `send_message`.
 
-**Ask Sir first** (live effects beyond the normal loop):
+**Use freely** (`send_message` spends Lovable credits; that's expected):
 
-- `deploy_project` — publishes a live URL.
-- `create_project` — spins up a new Lovable project on the account.
-- Any DDL/DML via `query_database` — schema and data changes are LV's lane; route them through an LV prompt. Direct DDL from you is a lane crossing even with permission.
+- `send_message`, `get_message`, `list_messages`: prompts, replies, polling. `plan_mode: true` plans without editing code.
+- `get_diff`, `list_edits`, `list_files`, `read_file`, `get_project`: inspect LV's work. `list_edits` gives each edit's commit SHA.
+- `get_project_knowledge` / `set_project_knowledge`: sync `control-center/lovable-knowledge.md` (kb-sync skill).
+- `query_database`: **SELECT only**, for debugging and verification.
+- `get_database_status`, `list_connectors`, `list_workspace_skills`, analytics tools: read-only checks.
 
-MCP inspection never replaces the local gate: after Sir pulls, `verify-after-pull.sh` still runs.
+**Ask Sir first** (live or workspace-wide effects):
+
+- `respond_to_approval`: always Sir's decision, never yours.
+- `deploy_project` (publishes a live URL), `create_project`, `remix_project`, `initiate_project`, `enable_database`, `add_connector`, `set_project_visibility`.
+- `set_workspace_knowledge` and workspace skill tools: they affect every project in the workspace.
+- Any DDL/DML via `query_database`: schema and data changes are LV's lane, so route them through an LV prompt. Direct DDL from you is a lane crossing even with permission.
+
+MCP inspection never replaces the local gate: after you pull, `verify-after-pull.sh` still runs.
 
 ## File size standards (also in base.md)
 
@@ -161,18 +151,25 @@ Max 50 lines per function across all tiers.
 ## Non-negotiable architectural rules
 
 1. All API request/response shapes live in `src/contracts/` — never inline.
-2. CORS on ALL edge function responses (success, error, OPTIONS).
-3. You never edit `supabase/functions/**` or `supabase/migrations/**`.
-4. LV never edits `src/components/**` (except `ui/`), `src/contracts/**`, `CLAUDE.md`, `OWNERSHIP.md`, or `control-center/**` (except writing into `lv-responses/` and `lv-blockers/`).
+2. Every backend endpoint validates its input and returns the contract's shape on success AND error (edge functions: CORS on every response, including OPTIONS).
+3. You never edit LV-owned paths in `OWNERSHIP.md`.
+4. LV never edits CC-owned paths in `OWNERSHIP.md`, including the CCLV block of `AGENTS.md`.
 5. CW never writes to production code. Reports only; suggested fixes go inside the report.
 6. Every backend feature ships with a contract update first.
 7. `control-center/build-state.md` is updated at end of every session that ships code.
-8. Run `bash scripts/verify-after-pull.sh` after every `git pull` from Lovable's branch.
+8. Run `bash scripts/verify-after-pull.sh` after every pull that brings in Lovable commits.
 9. Migrations are append-only.
 
 ## Engineering discipline (CC adaptation — full text in docs/standards/base.md)
 
-### §1 — Think before coding (ultrathink)
+### §1 — Think before coding
+
+Think in proportion to the task's tier:
+- Trivial — the standing rules below; no extended-thinking trigger.
+- Standard — think before coding or writing.
+- Major — ultrathink before coding.
+
+How the tiers map onto Claude Code (full table in base.md §1): Trivial runs at the default or `/effort low`; Standard at the default (medium on Opus 5.5); Major at `/effort high` or `xhigh`, or type `ultrathink` in the prompt for one turn. For LV, Major means sending a `plan_mode` message first.
 
 Don't assume. Don't hide confusion. Surface tradeoffs.
 

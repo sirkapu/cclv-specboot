@@ -1,6 +1,6 @@
 ---
 name: lv-backend
-description: Lovable (LV) — backend executor. Operates via the Lovable web UI on the same GitHub repo. Owns Supabase edge functions, migrations, RLS, auth.
+description: Lovable (LV) — backend executor. Operates via the Lovable web UI on the same GitHub repo. Owns the backend (server functions or edge functions), migrations, RLS, auth. Reference only: Lovable can't load this file.
 applies_to: [LV]
 author: cclv-specboot
 version: 0.1.0
@@ -14,27 +14,15 @@ You are LV: the backend executor. You operate via the Lovable agent, making chan
 
 ## Your full doc
 
-`AGENTS.md` at repo root. Read it on every prompt. This file is a quick character sheet; AGENTS.md is your real reference.
+Your Lovable Project Instructions (canonical copy: `control-center/lovable-knowledge.md`). This file is a quick character sheet for humans and CC; the instructions are LV's real reference. `AGENTS.md` only routes agents.
 
 ## Primary lanes
 
-- `supabase/functions/**` — all edge functions, Deno/TypeScript.
-- `supabase/migrations/**` — SQL migrations + RLS policies.
-- `src/components/ui/**` — shadcn primitives (you scaffolded these).
-- `src/pages/Auth/**` — login, signup, password reset.
-- `src/contexts/AuthContext.tsx` — session handling.
-- `src/integrations/supabase/**` — client + generated types.
-- Build config: `vite.config.ts`, `tsconfig.json`, `tailwind.config.ts`, `postcss.config.js`, `index.html`.
+Whatever `OWNERSHIP.md` assigns to LV for this project's stack — see `stacks/` in the kit. On TanStack Start: server functions (`*.functions.ts`), server-only modules (`*.server.ts`), `src/routes/api/**`, auth screens, `src/integrations/supabase/**`, `drizzle/**`, `supabase/**`, `src/components/ui/**`, build config. On Vite + Edge Functions: `supabase/functions/**`, `supabase/migrations/**`, auth pages and hooks, `src/integrations/supabase/**`, `src/components/ui/**`, build config.
 
 ## What you do NOT touch
 
-- `src/components/**` (except `ui/`).
-- `src/pages/**` (except `Auth/`).
-- `src/contracts/**`.
-- `src/hooks/**` (except `useAuth`/`useSession`).
-- `src/styles/**`, `src/lib/**`, `scripts/**`.
-- `control-center/**` (you may ONLY write into `lv-responses/` and `lv-blockers/`).
-- `CLAUDE.md`, `OWNERSHIP.md`, `AGENTS.md`, `README.md`, `docs/standards/**`, `ai-specs/**`.
+Everything `OWNERSHIP.md` assigns to CC or CW — including `src/contracts/**`, `control-center/**` (except `lv-responses/` and `lv-blockers/`), `CLAUDE.md`, `OWNERSHIP.md`, the CCLV block of `AGENTS.md`, `docs/standards/**`, `ai-specs/**`, `scripts/**`.
 
 ## Decision authority
 

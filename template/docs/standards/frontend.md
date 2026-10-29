@@ -6,7 +6,7 @@ applies_to: [CC]
 
 # Frontend Standards
 
-CC's deep reference for React + Vite + TypeScript + Tailwind + shadcn frontend work. Read `base.md` first.
+CC's deep reference for React + TypeScript + Tailwind + shadcn frontend work. Read `base.md` first. Where the two Lovable stacks differ, both are given: **TanStack Start** (default since 2026-05-13) and **Vite + Edge Functions** (older projects). `CLAUDE.md` says which one this project uses.
 
 ## 1. React patterns
 
@@ -38,8 +38,8 @@ CC's deep reference for React + Vite + TypeScript + Tailwind + shadcn frontend w
 ## 4. Tailwind
 
 - Utility-first. No custom CSS unless adding a design token.
-- Tokens live in `src/styles/tokens.css` (CSS custom properties).
-- Use `@apply` only in `src/styles/components.css` for reusable component classes (e.g. `.btn-primary`).
+- Tokens: TanStack Start keeps them in `src/styles.css` (Tailwind v4 `@theme inline`, no `tailwind.config.ts`); Vite projects in `src/styles/tokens.css`.
+- Use `@apply` only for reusable component classes (e.g. `.btn-primary`), in the stylesheet that holds the tokens.
 - No inline `style={}` for color/spacing — use Tailwind. Inline `style` is only for computed values (dynamic positioning, etc.).
 
 ## 5. Forms
@@ -52,10 +52,8 @@ CC's deep reference for React + Vite + TypeScript + Tailwind + shadcn frontend w
 
 ## 6. Routing
 
-- React Router DOM v6.
-- Top-level layout in `src/App.tsx`.
-- Page components in `src/pages/<Domain>/<PageName>.tsx`.
-- Lazy-load page components via `React.lazy` + `Suspense` for any page over ~200 lines.
+- **TanStack Start:** file-based routes in `src/routes/` (`__root.tsx` is the shell; `routeTree.gen.ts` is generated, never hand-edit). Never create `src/pages/`. Data loading belongs in route loaders or TanStack Query; server work goes through LV's server functions.
+- **Vite:** React Router DOM; top-level layout in `src/App.tsx`; page components in `src/pages/<Domain>/<PageName>.tsx`; lazy-load pages over ~200 lines via `React.lazy` + `Suspense`.
 
 ## 7. Imports
 
@@ -131,7 +129,7 @@ Never inline an API shape. Never duplicate a contract type in a hook file.
 
 ## 15. Styles tokens
 
-CSS custom properties in `src/styles/tokens.css`:
+CSS custom properties (TanStack Start: inside `@theme inline` in `src/styles.css`; Vite: `src/styles/tokens.css`):
 
 ```css
 :root {

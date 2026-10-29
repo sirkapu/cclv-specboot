@@ -1,0 +1,14 @@
+# Last refresh snapshot
+
+Written by the `kit-refresh` workflow at the end of each run, and read at the start of the next to decide what changed. Edit by hand only to correct it.
+
+- **Date:** 2026-10-28 (v0.4.0, see `docs/superpowers/specs/2026-10-28-kit-refresh-plan.md`)
+- **Spec Kit:** v1.2.5 (2026-10-28). `specify init --here --integration claude`; `/speckit-implement` runs every task; constitution at `.specify/memory/constitution.md`; git extension opt-in.
+- **Claude Code:** v2.1.312 (2026-10-27). 5.5 aliases need v2.1.293+; typed `ultrathink` → `xhigh` since v2.1.311; Claude Code reads only `CLAUDE.md` when both exist (import `@AGENTS.md`).
+- **Claude models:** Fable 5.1 (`claude-fable-5-1`), Opus 5.5 (`claude-opus-5-5`), Sonnet 5.5 (`claude-sonnet-5-5`, 2026-09-28), Haiku 5.5 (`claude-haiku-5-5`, 2026-10-07). Claude Code default: Opus 5.5 at medium effort. Sonnet 4.5 retires 2026-11-30.
+- **Lovable MCP tools:** add_connector, create_project, create_workspace_skill, delete_workspace_skill, deploy_project, enable_database, get_database_status, get_diff, get_file_upload_url, get_me, get_message, get_project, get_project_analytics, get_project_analytics_trend, get_project_knowledge, get_workspace, get_workspace_knowledge, get_workspace_skill, initiate_project, list_connectors, list_custom_connectors, list_design_systems, list_edits, list_files, list_messages, list_projects, list_template_projects, list_workspace_skills, list_workspaces, move_projects_to_folder, query_database, read_file, remix_project, render_project_widget, respond_to_approval, send_message, set_folder_visibility, set_project_knowledge, set_project_visibility, set_workspace_knowledge, update_workspace_skill.
+- **Lovable MCP semantics:** `send_message` waits ≤600 s; `get_message` top-level status never terminal (read `response.status`); a new `send_message` supersedes a pause; `respond_to_approval` needs `event_id` + top-level `message_id`; secrets and credit check-ins are editor-only.
+- **Lovable scaffold:** template `tanstack_start_ts_current`, revision `tanstack_start_ts_current-3341755609d5`; TanStack Start + React 19 + Tailwind v4 + bun; server functions in `*.functions.ts` with `requireSupabaseAuth` middleware and `inputValidator`; Drizzle migrations in `drizzle/migrations/`; ships root `AGENTS.md` with a `LOVABLE:BEGIN/END` block and appends rules to it.
+- **Lovable commit identity:** `gpt-engineer-app[bot]` in raw git log (`lovable-dev[bot]` on GitHub), `X-Lovable-Edit-ID` trailer on edit commits.
+- **AGENTS.md readers:** Codex, Cursor, Copilot, Antigravity, Devin, Jules, Zed, opencode, Cline, Lovable. No tool reads `codex.md`.
+- **Open, unverified at this snapshot:** Supabase's 2026-10-30 default-grants change for new public tables; legacy anon/service_role key deprecation timing; whether Lovable honors `AGENTS.override.md`.

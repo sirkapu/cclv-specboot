@@ -21,8 +21,9 @@ Run from project root:
 ```bash
 echo "Components: $(ls src/components/*.tsx 2>/dev/null | wc -l)"
 echo "Hooks: $(ls src/hooks/*.ts 2>/dev/null | wc -l)"
-echo "Pages: $(find src/pages -name '*.tsx' 2>/dev/null | wc -l)"
+echo "Routes/pages: $(find src/routes src/pages -name '*.tsx' 2>/dev/null | wc -l)"
 echo "Contracts: $(ls src/contracts/*.ts 2>/dev/null | wc -l)"
+echo "Server functions files: $(find src -name '*.functions.ts' 2>/dev/null | wc -l)"
 echo "Edge functions: $(ls supabase/functions 2>/dev/null | grep -v _shared | wc -l)"
 ```
 
@@ -43,7 +44,7 @@ Append (newest at top):
 - [ ] [item]
 
 **Lane crossings:** [none | list]
-**Lovable Knowledge:** [unchanged | updated, synced via MCP | updated, Sir to re-paste]
+**LV Project Instructions:** [unchanged | updated, synced via MCP | updated, Sir to re-paste]
 **Notes:** [free text]
 ```
 
@@ -53,7 +54,7 @@ Sections to keep current:
 
 - **Routes** — every top-level route + one-line description.
 - **Data models** — every table + key columns.
-- **Edge functions inventory** — every function + one-line + credit cost.
+- **Backend endpoint inventory** — every server function / server route / edge function + one-line + credit cost.
 - **Contracts inventory** — every contract file + status.
 - **Design system** — component count, key primitives.
 

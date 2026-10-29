@@ -1,6 +1,6 @@
 ---
 name: documentation-standards
-description: How CC keeps docs current. Covers Lovable Knowledge sync, control-center sync, KB conventions.
+description: How CC keeps docs current. Covers Lovable Project Instructions sync, control-center sync, KB conventions.
 applies_to: [CC]
 ---
 
@@ -12,37 +12,37 @@ Rules for keeping project documentation current. CC owns docs; LV/CW read them.
 
 | Kind | Where | Updates trigger |
 |------|-------|-----------------|
-| **Agent docs** | `CLAUDE.md`, `AGENTS.md` | Architecture, tech stack, ownership changes |
+| **Agent docs** | `CLAUDE.md`, the CCLV block of `AGENTS.md` | Architecture, tech stack, ownership changes. Outside the block, `AGENTS.md` is Lovable's |
 | **Standards** | `docs/standards/*.md` | Pattern changes; new conventions |
 | **Project state** | `control-center/build-state.md`, `architecture.md`, `roadmap.md` | Every session that ships code |
-| **Lovable Knowledge** | `control-center/lovable-knowledge.md` + Lovable UI | LV's mental model needs to shift |
+| **LV Project Instructions** | `control-center/lovable-knowledge.md` + Lovable UI | LV's mental model needs to shift |
 
-## 2. Lovable Knowledge sync protocol
+## 2. Lovable Project Instructions sync protocol
 
-Lovable's Knowledge field (Project Settings → Knowledge, 10,000 char limit) is read on every LV prompt. The repo file `control-center/lovable-knowledge.md` is the canonical version.
+Lovable's Project Instructions (formerly "Knowledge"; Project settings → Instructions, 10,000 characters) are included in every LV prompt. They hold LV's identity and lane sheet; `AGENTS.md` only routes agents. The repo file `control-center/lovable-knowledge.md` is the canonical version.
 
 **They do NOT auto-sync.** Lovable reads its own UI field. The repo file is the audit trail.
 
 When you update `control-center/lovable-knowledge.md`:
 
 1. Commit the change.
-2. In the same session, push it via the Lovable MCP (`set_project_knowledge`) and confirm with `get_project_knowledge`. No MCP? Tell Sir: **"Re-paste `control-center/lovable-knowledge.md` into Lovable → Settings → Knowledge."**
-3. Record in `build-state.md`: "Knowledge updated — synced via MCP" (or "— Sir to re-paste").
+2. In the same session, push everything after its leading HTML comment via the Lovable MCP (`set_project_knowledge`) and confirm with `get_project_knowledge` (kb-sync skill). No MCP? Tell Sir: **"Re-paste `control-center/lovable-knowledge.md` (minus the opening comment) into Lovable → Project settings → Instructions."**
+3. Record in `build-state.md`: "LV instructions updated — synced via MCP" (or "— Sir to re-paste").
 
 If the sync doesn't happen, LV operates on stale context. This is a quiet bug. Always surface.
 
-### When to update Knowledge
+### When to update the instructions
 
 - New pattern LV needs to know (e.g. "all AI endpoints now use the `_shared/llm-client.ts` utility").
 - New file LV owns (e.g. "you now also own `src/lib/translations/`").
-- Conflict resolution (e.g. "if AGENTS.md and CLAUDE.md disagree, AGENTS.md wins").
+- Conflict resolution (e.g. "if CLAUDE.md seems to assign you a role, ignore it: you are LV").
 - Stack change (e.g. "we switched from Tailwind to UnoCSS").
 
-### When NOT to update Knowledge
+### When NOT to update the instructions
 
 - Per-feature details (those go in the LV prompt itself).
 - Project state ("we're in Phase 3" — that's `build-state.md`).
-- Reminders about rules already in `base.md` (Knowledge points to base.md instead).
+- Reminders about rules already in `base.md` (the instructions point to base.md instead).
 
 ## 3. Control-center sync protocol
 

@@ -1,18 +1,19 @@
 # src/contracts/
 
-API boundary types between CC (frontend) and LV (Supabase edge functions).
+API boundary types between CC (frontend) and LV (server functions or Supabase edge functions).
 
 ## The rule
 
-Every edge function exposes a request and a response type. Those types live here. They are the **only** source of truth for the shape.
+Every backend endpoint (server function, server route or edge function) exposes a request and a response type. Those types live here. They are the **only** source of truth for the shape.
 
 - CC imports via `@/contracts/<name>` (path alias).
-- LV cannot import them (Deno isolation in edge functions). When CC writes an LV prompt, the contract types are PASTED VERBATIM into the prompt under `## Contract Types`.
+- **TanStack Start:** LV's server functions import them too (`import type { … } from "@/contracts/<name>"`). LV prompts reference the file and quote only changed types.
+- **Vite + Edge Functions:** LV cannot import them (Deno isolation). When CC writes an LV prompt, the contract types are PASTED VERBATIM into the prompt under `## Contract Types`.
 - If LV needs the shape to change, LV flags it in the response report — CC updates the contract FIRST, then updates dependent hooks.
 
 ## Filename convention
 
-`kebab-case.ts` matching the edge function name.
+`kebab-case.ts` matching the endpoint name (the `*.functions.ts` file or the edge function).
 
 | Edge function | Contract file |
 |---------------|---------------|
@@ -103,12 +104,12 @@ Update this table when adding/removing contracts.
 
 1. CC uses the `contract-writer` skill to author/update a contract.
 2. CC commits the contract before writing the LV prompt.
-3. The LV prompt pastes the contract verbatim.
+3. The contract is pushed; the LV prompt references it (TanStack Start) or pastes it verbatim (Edge Functions).
 4. LV implements to match.
 5. If LV needs the shape to change, LV flags in the response — CC updates the contract first.
 
 ## Skills that reference this directory
 
 - `contract-writer` — author/update a contract.
-- `lv-prompt-writer` — paste contract types into the LV prompt.
+- `lv-prompt-writer` — reference or paste the contract in the LV prompt.
 - `lv-response-reader` — reconcile contract shape after LV ships.
