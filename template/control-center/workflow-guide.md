@@ -16,21 +16,22 @@ How CC, LV, and CW collaborate. Concrete worked example below.
    │      │                                                    │  │
    │      yes                                                  │  │
    │      ▼                                                    │  │
-   │  CC: contract-writer → lv-prompt-writer                   │  │
+   │  CC: contract-writer (commit + push) → lv-prompt-writer   │  │
    │      │                                                    │  │
    │      ▼                                                    │  │
-   │  CC sends prompt via Lovable MCP send_message             │  │
+   │  CC: send_message (plan_mode first if Major)              │  │
    │  (no MCP? Sir pastes it into Lovable)                     │  │
    │      │                                                    │  │
    │      ▼                                                    │  │
-   │  LV executes → replies in chat; CC answers questions      │  │
+   │  LV executes; CC builds its own lane meanwhile            │  │
+   │  paused? Sir decides → CC: respond_to_approval            │  │
    │      │                                                    │  │
    │      ▼                                                    │  │
-   │  CC: lv-response-reader (get_message + get_diff)          │  │
+   │  CC: git pull (--ff-only, or --rebase) → verify-after-pull│  │
+   │      │                                                    │  │
+   │      ▼                                                    │  │
+   │  CC: lv-response-reader (reply + get_diff)                │  │
    │      → writes lv-responses/                               │  │
-   │      │                                                    │  │
-   │      ▼                                                    │  │
-   │  Sir pulls; CC: verify-after-pull                         │  │
    │      │                                                    │  │
    │      ▼                                                    │  │
    │  CC wires frontend ─────────────────────────────────────▶ │  │
@@ -43,7 +44,7 @@ How CC, LV, and CW collaborate. Concrete worked example below.
    │  CC: cw-brief-writer                                         │
    │      │                                                       │
    │      ▼                                                       │
-   │  Sir opens second Claude session on qa/ branch               │
+   │  CC runs the cw-reviewer subagent on the brief               │
    │      │                                                       │
    │      ▼                                                       │
    │  CW executes brief → writes cw-reports/                      │
@@ -59,68 +60,92 @@ How CC, LV, and CW collaborate. Concrete worked example below.
 
 ---
 
+## With Spec Kit (optional spec layer)
+
+If the project ran `specify init --here --integration claude`, planning goes through Spec Kit and the loop above starts from its tasks:
+
+1. `/speckit-specify` → `/speckit-clarify` (optional) → `/speckit-plan` → `/speckit-tasks`, writing `specs/NNN-<feature>/`.
+2. `bash scripts/spec-lanes.sh` splits the open tasks into CC and LV lanes from `OWNERSHIP.md` (spec-lanes skill). Split MIXED tasks; add rows for UNKNOWN ones.
+3. LV tasks → one LV prompt (lv-prompt-writer), sent early because they usually block the user stories.
+4. CC tasks → `/speckit-implement Implement ONLY tasks … (CC lane) …`, using the exact line the script prints. Stock `/speckit-implement` would also build LV's tasks.
+5. After LV's push passes verify-after-pull, CC ticks the LV tasks `[X]`.
+
+---
+
+## Paste mode (no Lovable MCP)
+
+The courier fallback, when the MCP isn't connected:
+
+1. CC writes the prompt as usual and tells Sir: "Paste `control-center/lv-prompts/LV-[NAME].md` into Lovable." The prompt's Reply section asks LV to write its own response file.
+2. LV builds and writes `control-center/lv-responses/LV-[NAME]-response.md` (or `lv-blockers/` if stuck).
+3. CC pulls, runs `verify-after-pull.sh`, and reads the response file (lv-response-reader, paste mode).
+4. When `lovable-knowledge.md` changes, Sir re-pastes it (minus the opening comment) into Project settings → Instructions.
+
+---
+
 ## Worked example — "Add product image generation"
+
+TanStack Start project (Lovable's default). On the Vite + Edge Functions stack the backend files differ (`supabase/functions/`, `supabase/migrations/`) and the contract is pasted instead of imported; the loop is the same.
 
 ### Step 1 — CC plans
 
 Slice: users can request AI-generated product images. Needs:
-- New edge function `generate-product-image`.
-- New table `generated_images`.
-- New hook `useGenerateProductImage`.
-- New component `ProductImageGenerator`.
+- New server function `generateProductImage` in `src/lib/product-image.functions.ts` (LV).
+- New table `generated_images` (LV).
+- New hook `useGenerateProductImage` and component `ProductImageGenerator` (CC).
 - Credit cost: 3.
 
 ### Step 2 — CC writes the contract
 
-Uses `contract-writer` skill. Creates `src/contracts/generate-product-image.ts` with `Request`, `Response`, type guards, `GENERATE_PRODUCT_IMAGE_CREDITS = 3`. Commits.
+Uses `contract-writer` skill. Creates `src/contracts/product-image.ts` with `Request`, `Response`, type guards, `GENERATE_PRODUCT_IMAGE_CREDITS = 3`. Commits **and pushes**.
 
 ### Step 3 — CC writes the LV prompt
 
 Uses `lv-prompt-writer` skill. Creates `control-center/lv-prompts/LV-product-image-gen.md`. Includes:
 - Context (where this fits).
-- Scope: edge function + migration + RLS.
-- Contract types (pasted verbatim).
+- Scope: server function + migration (grants + RLS).
+- Contract: "import from `@/contracts/product-image`".
 - Implementation details (table schema, RLS, idempotency, credit flow).
 - Required secret: `IMAGE_PROVIDER_API_KEY`.
 
-Sends it to LV via the Lovable MCP (`send_message`).
+It's a Standard slice, so CC sends it straight away with `send_message` (a Major one would go with `plan_mode: true` first).
 
 ### Step 4 — LV executes
 
-CC polls `get_message`. LV asks one question mid-run ("charge credits before or after the provider call?") — CC answers in-chat. LV pushes to `main`:
-- `supabase/migrations/20260522140000_add_generated_images.sql`.
-- `supabase/functions/generate-product-image/index.ts`.
-- `supabase/functions/_shared/...` (if extended).
+While LV works, CC builds `ProductImageGenerator` against the pushed contract. The turn comes back `awaiting_input`: LV is asking for `IMAGE_PROVIDER_API_KEY` through a secure form. CC sends Sir to the `editor_url`; Sir enters the key there, and LV finishes. Its reply asks one question ("charge credits before or after the provider call?"); CC answers with a new `send_message`, and LV completes the slice:
+- `drizzle/migrations/…_add_generated_images.sql`.
+- `src/lib/product-image.functions.ts`, `src/lib/image-provider.server.ts`.
 
-### Step 5 — CC processes the reply
+### Step 5 — CC pulls and verifies
 
-Uses `lv-response-reader` skill: reads the final `get_message` reply, pulls `get_diff`, cross-checks. Finds:
+```bash
+git pull --ff-only
+bash scripts/verify-after-pull.sh
+```
+
+Reports: 3 Lovable commits, no lane crossings, lint clean, build passes.
+
+### Step 6 — CC processes the reply
+
+Uses `lv-response-reader` skill: reads the final reply, pulls `get_diff`, cross-checks. Finds:
 - Files created/modified — match scope ✓.
 - No lane crossings ✓.
 - Contract unchanged ✓.
-- Secret `IMAGE_PROVIDER_API_KEY` required — Sir confirms set in Supabase.
+- Secret `IMAGE_PROVIDER_API_KEY` set ✓.
 - One known issue: timeout sometimes returns 504, LV suggests retry-on-client.
 
 Distills all of it into `control-center/lv-responses/LV-product-image-gen-response.md` and commits.
 
-### Step 6 — Sir pulls; CC runs verify-after-pull
-
-```bash
-bash scripts/verify-after-pull.sh
-```
-
-Reports: no lane crossings, lint clean, build passes.
-
 ### Step 7 — CC smoke-tests
 
-`npm run dev`, hits the endpoint via DevTools, confirms 200 + expected shape.
+`bun run dev`, exercises the flow, confirms the server function returns the contract shape.
 
 ### Step 8 — CC wires frontend
 
 Creates:
 - `src/hooks/useGenerateProductImage.ts`.
-- `src/components/ProductImageGenerator.tsx`.
-- Integrates into the relevant page.
+- Wires `ProductImageGenerator` (built in Step 4) to the hook.
+- Integrates it into the relevant route.
 
 Commits with `commit` skill.
 
@@ -128,7 +153,7 @@ Commits with `commit` skill.
 
 Uses `cw-brief-writer` skill. Creates `control-center/cw-briefs/CW-product-image-gen.md` with 5 cases (golden + edge cases for empty input, insufficient credits, timeout, unauthorized).
 
-Tells Sir: "Open Cowork on `qa/CW-product-image-gen`."
+Runs the `cw-reviewer` subagent: "Run CW on `control-center/cw-briefs/CW-product-image-gen.md`."
 
 ### Step 10 — CW executes
 
@@ -145,7 +170,7 @@ Uses `cw-report-triage` skill. Applies the toast fix. Commits.
 
 Uses `update-control-center` skill:
 - `build-state.md` entry.
-- `architecture.md` — adds `generate-product-image` to edge function inventory + `generated_images` to data models.
+- `architecture.md` — adds `generateProductImage` to the backend endpoint inventory + `generated_images` to data models.
 - `roadmap.md` — checks off the milestone.
 - `OWNERSHIP.md` — no new top-level paths, no change.
 - `CLAUDE.md` known issues — adds "504 timeout occasional on image gen, client retries."

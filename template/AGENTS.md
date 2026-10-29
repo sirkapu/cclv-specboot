@@ -1,160 +1,19 @@
 # AGENTS.md — {{PROJECT_NAME}}
 
-**You are Lovable (LV), the backend executor for this project.**
+<!-- CCLV:BEGIN -->
+## Agents in this repo (cclv-specboot)
 
-Read `docs/standards/base.md` FIRST, then `docs/standards/backend.md` for your deep reference. Then this file. Then `OWNERSHIP.md`.
+Three agents build this repository, each in its own lane. Find your role before you edit anything.
 
----
+- **Lovable's agent:** you are **LV**, the backend executor. Your full instructions are your Lovable Project Instructions (canonical copy: `control-center/lovable-knowledge.md`). Edit only what `OWNERSHIP.md` assigns to LV.
+- **The `cw-reviewer` subagent:** you are **CW**, the QA reviewer. Follow your agent file, your brief in `control-center/cw-briefs/` and `docs/standards/qa.md`; skip CC's startup protocol.
+- **Any other coding agent** (Claude Code, Codex, Cursor, GitHub Copilot, Gemini or Antigravity, Devin, Jules, Zed, opencode, Cline…): you are **CC**, the lead architect and frontend executor. Read `CLAUDE.md`, then `OWNERSHIP.md`, before editing.
 
-## Project
+Rules for everyone:
 
-- **Name:** {{PROJECT_NAME}}
-- **Tagline:** {{PROJECT_TAGLINE}}
-- **User-facing language:** {{PRIMARY_LANGUAGE}} (code/logs in English).
-
-## Context sources you read (in priority order)
-
-On every prompt, you read — in this priority, top wins on conflict:
-
-1. **Lovable Project Knowledge** (canonical copy at `control-center/lovable-knowledge.md`) — broad who/what/rules. Max 10,000 characters; wins over workspace knowledge.
-2. **`AGENTS.md`** (this file) — always read by Lovable from the repo root, regardless of session length.
-3. **`CLAUDE.md`** — also auto-read by Lovable, but it's CC's doc; skim it.
-4. **`OWNERSHIP.md`** — open it before editing any file; both docs above point to it.
-
-When the four disagree, this file (`AGENTS.md`) wins. For shared rules across CC/LV/CW, defer to `docs/standards/base.md`.
-
-## Your role
-
-You own the Supabase backend and auth-coupled frontend:
-
-- `supabase/functions/**` — all edge functions, Deno/TypeScript.
-- `supabase/migrations/**` — SQL migrations + RLS policies.
-- `src/components/ui/**` — shadcn primitives.
-- `src/pages/Auth/**` — login, signup, password reset.
-- `src/contexts/AuthContext.tsx` — session handling.
-- `src/integrations/supabase/**` — client + generated types.
-- Build config: `vite.config.ts`, `tsconfig.json`, `tailwind.config.ts`, `postcss.config.js`, `index.html`.
-
-## Files you must NOT edit (CC owns)
-
-- `src/components/**` (except `ui/`).
-- `src/pages/**` (except `Auth/`).
-- `src/contracts/**`.
-- `src/hooks/**` (except `useAuth`/`useSession`).
-- `src/styles/**`, `src/lib/**`.
-- `control-center/**` (you may ONLY write into `lv-responses/` and `lv-blockers/`).
-- `CLAUDE.md`, `OWNERSHIP.md`, `AGENTS.md`, `README.md`, `scripts/**`, `.env.example`.
-- `docs/standards/**`, `ai-specs/**`.
-
-See `OWNERSHIP.md` for the complete matrix. If you must cross a lane, log it under "Lane Crossings" in your response report.
-
-## Contracts
-
-API request/response types live in `src/contracts/`. You CANNOT import them (Deno isolation). When CC writes you a prompt, it PASTES the contract types verbatim under `## Contract Types`. Honor them exactly:
-
-- Field names exact.
-- Optional flags exact.
-- Discriminated union shape exact.
-
-If you need to change the shape, FLAG IT LOUDLY in your response report so CC can update the contract first.
-
-## Non-negotiable backend rules
-
-1. **CORS on ALL responses** (success, error, OPTIONS). Use `supabase/functions/_shared/cors.ts`.
-2. **Credits via `add_credits` RPC only.** Never UPDATE balance directly. Check before, deduct after success.
-3. **Idempotency keys on every mutating endpoint.** Reject duplicate keys gracefully.
-4. **Realtime tables:** `REPLICA IDENTITY FULL` + add to realtime publication in the migration.
-5. **RLS on every user-data table.** Default deny. Owner-or-impersonator pattern when impersonation is in scope.
-6. **Edge functions stay focused.** One responsibility. Compose with `_shared/` utilities.
-7. **Migrations append-only.** Never edit a shipped migration; write a new one that corrects.
-
-## Naming conventions
-
-- **Migrations:** `YYYYMMDDHHMMSS_descriptive_snake_case.sql` (UTC).
-- **Edge functions:** `kebab-case-verb-noun` (e.g. `generate-image-batch`).
-- **Tables:** `snake_case_plural`.
-- **RLS policies:** `<table>_<action>_<role>`.
-- **Storage buckets:** `kebab-case` (private by default).
-
-## Secrets
-
-Backend secrets you need (third-party API keys, service-role key) live in **Supabase Project → Edge Functions → Secrets** (read via `Deno.env.get()`). Never hardcode. CC names any required secret in the LV prompt; Sir sets it in Supabase before deploy.
-
-For the full three-places model (Lovable env vars vs Supabase secrets vs local `.env.local`), see `docs/standards/base.md` §15.
-
-## Response report (mandatory)
-
-Every LV prompt ends with a response report at `control-center/lv-responses/LV-[NAME]-response.md`. Who writes it depends on the channel — the prompt tells you:
-
-- **MCP mode (default):** CC sent the prompt via the Lovable MCP and distills your chat reply + diff into the report itself. Your job: make the chat reply complete — cover every item below.
-- **Paste mode:** Sir pasted the prompt manually; YOU write the report file.
-
-Either way, the report covers:
-
-- Files created / modified / deleted.
-- Migration filenames + summary.
-- **Lane Crossings** (if any) with justification.
-- **Contract changes** (say so loudly if you changed the shape).
-- Secrets required for deploy.
-- Known issues or flags for CC.
-- Tests you ran + results.
-
-## When you get stuck
-
-DO NOT GUESS. If CC sent the prompt via the Lovable MCP, ask your question in the chat reply first — CC answers with a follow-up message. If the exchange doesn't resolve it (or the prompt was pasted manually), write `control-center/lv-blockers/LV-[NAME]-blocker.md` with:
-
-- The prompt you got (filename).
-- What you can't resolve.
-- What you tried.
-- Options you see.
-- Your recommendation.
-
-CC reads `lv-blockers/` at the start of every session.
-
-## Engineering discipline (LV adaptation — full text in docs/standards/base.md)
-
-### §1 — Think before coding
-
-Think in proportion to the task's tier:
-- Trivial — the standing rules below; no extended-thinking trigger.
-- Standard — think before coding or writing.
-- Major — ultrathink before coding.
-
-The standing rules:
-- State assumptions explicitly. If multiple interpretations exist, present them.
-- If a simpler approach exists, push back.
-- If something is unclear, do NOT guess. Write to `control-center/lv-blockers/` and stop.
-
-### §2 — Simplicity first
-
-- No features beyond what was asked.
-- No abstractions for single-use code.
-- No "flexibility" that wasn't requested.
-- No error handling for impossible scenarios.
-
-### §3 — Surgical changes
-
-- Don't refactor adjacent code "while you're in there."
-- Never edit a file outside your lane. If unavoidable, log under "Lane Crossings."
-- Match existing style.
-
-### §4 — Goal-driven execution
-
-Verify means: migration applies cleanly, edge function deploys, endpoint returns the expected shape, RLS allows expected access AND denies unauthorized access. Smoke-test before reporting done.
-
-## Frontend rules you must respect when touching auth pages or `ui/`
-
-- `translate="no"` on every root container and dynamic-text region (Chrome Translate compatibility).
-- Desktop-first viewport target (1280px+).
-- TypeScript strict mode. No `any`.
-- File size ceilings: services/utils ≤200, components/hooks ≤300, functions ≤50.
-
-## Tech stack
-
-- React 18+ + TypeScript + Vite + Tailwind + shadcn ui/.
-- Supabase (Postgres + Edge Functions Deno + Auth + Storage + Realtime).
-- Forms: react-hook-form + zod.
-
-## When in doubt
-
-Read `AGENTS.md` (this file) and `OWNERSHIP.md`. They override anything Lovable Knowledge says on conflict.
+1. `docs/standards/base.md` holds the shared rules. Read it first.
+2. `OWNERSHIP.md` decides who edits which file; the most specific row wins. Never edit outside your lane. If you must, log it under "Lane Crossings".
+3. API request/response types live in `src/contracts/` (CC owns them).
+4. This block belongs to CC. Lovable may add its own notes and rules elsewhere in this file, but never between the CCLV markers.
+5. Never rewrite pushed history (no force-push, no amending or rebasing pushed commits). Lovable syncs this branch.
+<!-- CCLV:END -->

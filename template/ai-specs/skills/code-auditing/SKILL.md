@@ -29,17 +29,17 @@ npm audit
 ```
 
 Plus manual checks:
-- Are any secrets committed? `git log --all --full-history -- '*.env*'`.
-- Does any client-side code embed Supabase service-role key? `grep -rn "service_role" src/`.
-- Are RLS policies in place for every user-data table? Cross-check `OWNERSHIP.md` table list against `supabase/migrations/`.
-- Are signed URLs used for storage? `grep -rn "createPublicUrl" src/` (should be empty unless explicit public buckets).
+- Are any secrets committed? `.env` is committed on purpose (public values only), so check what it holds: `git log --all --full-history -p -- .env | grep -E '^\+[A-Z_]+=' | grep -v -E 'VITE_SUPABASE_(URL|PUBLISHABLE_KEY|PROJECT_ID)|SUPABASE_(URL|PUBLISHABLE_KEY|PROJECT_ID)'` should print nothing, and `git log --all --full-history -- '.env.local' '.env.*.local'` must be empty.
+- Does any client-side code embed a server key? `grep -rnE "service_role|sb_secret_" src/ --include='*.ts' --include='*.tsx' | grep -v -E '\.(server|functions)\.ts:'` — and look for `eyJ…` JWTs pasted into client code.
+- Are RLS policies in place for every user-data table? Cross-check the tables in `drizzle/migrations/` and `supabase/migrations/` against their policies.
+- Are signed URLs used for storage? `grep -rn "getPublicUrl" src/` (should be empty unless explicit public buckets).
 - Are auth pages free of inline scripts / dangerous URLs?
 
 ### Phase 2 — Performance
 
 - Bundle size: `npm run build` + check `dist/` size.
 - Largest components: `find src/components -name '*.tsx' -exec wc -l {} + | sort -nr | head -10`.
-- Lazy-loading coverage: `grep -rn "React.lazy" src/pages/`.
+- Lazy-loading coverage (Vite stack): `grep -rn "React.lazy" src/pages/`. TanStack Start code-splits routes itself.
 - N+1 risk: `grep -rn "await Promise.all" src/` and audit each.
 - Realtime subscription leaks: every `.subscribe()` should have a `.unsubscribe()` in cleanup.
 
@@ -67,7 +67,7 @@ For each Tier 2 component (≤ 300 lines):
 - Direct API call instead of hook? Flag.
 - Inline contract type instead of `@/contracts/`? Flag.
 
-For each edge function:
+For each backend endpoint (server function, server route or edge function):
 - CORS on all responses? Check.
 - Uses `_shared/` utilities? Check.
 - Idempotency on mutations? Check.

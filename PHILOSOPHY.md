@@ -9,7 +9,7 @@ Multi-agent dev workflows have a coordination problem. If two AI agents share a 
 3. **Lose context across sessions** — no persistent memory of what shipped, what's next.
 4. **Block each other** — CC waits for LV; LV doesn't know what CC needs.
 
-[lidr-specboot](https://github.com/LIDR-academy/lidr-specboot) solves part of this (shared standards via symlinked docs) but assumes **one agent**. Multi-agent multi-role needs more.
+[GitHub Spec Kit](https://github.com/github/spec-kit) solves the spec part of this (spec → plan → tasks) but assumes **one agent builds everything**: `/speckit-implement` runs every task in `tasks.md`. Multi-agent multi-role needs more.
 
 ## The three-player model
 
@@ -18,13 +18,14 @@ This kit assumes three roles:
 | Role | Tool | Owns |
 |------|------|------|
 | **CC** — Architect + frontend | Claude Code (local) | Frontend, contracts, docs, control-center |
-| **LV** — Backend | Lovable (web UI) | Supabase edge functions, migrations, RLS, auth pages |
-| **CW** — QA | Claude Cowork (or a 2nd Claude Code session) | Test plans, QA reports |
+| **LV** — Backend | Lovable (web UI, driven by CC over MCP) | Server functions or edge functions, migrations, RLS, auth |
+| **CW** — QA | `cw-reviewer`, a Claude Code subagent | Test plans, QA reports |
 
 Each role has its own primary doc:
 - **CC reads** `CLAUDE.md` first.
-- **LV reads** `AGENTS.md` first.
+- **LV reads** its Lovable Project Instructions (canonical copy: `control-center/lovable-knowledge.md`).
 - **CW reads** the CW brief CC writes for it, plus `OWNERSHIP.md`.
+- **Everyone** reads the routing block in `AGENTS.md`, which tells each agent which role it plays.
 
 ## Three sources of truth
 
@@ -34,26 +35,29 @@ Each role has its own primary doc:
 | `src/contracts/` | API shapes between CC and LV. |
 | `docs/standards/base.md` | Cross-agent behavioral rules. |
 
-Anything else is project-specific opinion that lives in `CLAUDE.md`, `AGENTS.md`, or per-role standards.
+Anything else is project-specific opinion that lives in `CLAUDE.md`, LV's Project Instructions, or per-role standards.
 
-## Why not symlink CLAUDE.md = AGENTS.md (lidr's approach)?
+## Why AGENTS.md is a router, not anyone's doc
 
-lidr makes `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `codex.md` all point to the same source. Elegant for **single-developer-multi-tool**: one source, every tool finds it.
+The single-agent answer is one doc that every tool reads: symlink `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` to the same file (lidr-specboot's approach), or let every tool read one `AGENTS.md`. Elegant for **single-developer-multi-tool**.
 
-For **multi-role multi-agent**, it's wrong. CC and LV have different jobs. CC needs detailed frontend architecture; LV needs lane boundaries and Supabase patterns. Forcing them to read the same doc means each agent reads a lot of irrelevant content — which degrades attention on the relevant parts.
+For **multi-role multi-agent**, it's wrong. CC and LV have different jobs. CC needs detailed frontend architecture; LV needs lane boundaries and backend patterns. Forcing them to read the same doc means each agent reads a lot of irrelevant content, which degrades attention on the relevant parts.
+
+And `AGENTS.md` can't be one role's private doc either. Codex, Cursor, Copilot, Gemini/Antigravity, Devin, Jules, Zed, opencode and Cline all read the root `AGENTS.md`; the format has no way to address one agent; and Lovable ships its own `AGENTS.md` and appends project rules to it. An `AGENTS.md` that opens with "You are Lovable" turns every other tool into LV.
 
 Our split:
-- `CLAUDE.md` — long, CC-specific.
-- `AGENTS.md` — short, LV-specific.
-- Both **start with** "Read `docs/standards/base.md` first."
+- `AGENTS.md` — a short, role-neutral routing block (between `CCLV` markers) next to Lovable's own content: "Lovable's agent is LV; every other agent is CC; CW is a subagent."
+- `CLAUDE.md` — long, CC-specific. It imports `AGENTS.md`, so CC also sees the rules Lovable recorded.
+- LV's Project Instructions — LV's identity, lane and backend rules, inside Lovable's 10,000-character field.
+- All of them point to `docs/standards/base.md` first.
 
-Shared standards in one file; role-specific docs layer on top. Two ~250-line agent docs beat one ~500-line doc both agents skim.
+Shared standards in one file; role-specific docs layer on top.
 
 ## Why control-center
 
 The `control-center/` directory is the asynchronous communication channel between CC, LV, and CW:
 
-- CC writes `lv-prompts/LV-[NAME].md` → LV reads, executes, writes `lv-responses/LV-[NAME]-response.md`.
+- CC writes `lv-prompts/LV-[NAME].md` and sends it over the Lovable MCP → LV executes and replies → CC records the reply in `lv-responses/LV-[NAME]-response.md` (in paste mode, LV writes it).
 - LV writes `lv-blockers/LV-[NAME]-blocker.md` when stuck → CC reads at the start of next session.
 - CC writes `cw-briefs/CW-[NAME].md` → CW executes, writes `cw-reports/CW-[NAME]-report.md`.
 - `build-state.md` is the running session log.
@@ -63,12 +67,11 @@ Without this structure, "what's LV doing right now" and "did LV finish what I as
 
 ## Why contracts
 
-Lovable cannot import TypeScript types from `src/contracts/` (Deno isolation). But the type IS the canonical API shape. We solve this by:
+The type IS the canonical API shape, so it lives in one place, `src/contracts/`, owned by CC:
 
-1. CC defines/updates the contract file FIRST.
-2. CC's LV prompt PASTES the contract type verbatim under `## Contract Types`.
-3. LV implements the edge function to match.
-4. If LV needs to change the shape, LV flags it in the response report — CC updates the contract; the cycle repeats.
+1. CC defines/updates the contract file FIRST, and pushes it.
+2. LV implements the endpoint to match. On TanStack Start, LV's server functions **import** the contract (`@/contracts/<name>`). On the older Vite + Edge Functions stack, Deno can't import it, so CC's prompt **pastes** it verbatim.
+3. If LV needs to change the shape, LV flags it in its reply — CC updates the contract; the cycle repeats.
 
 This is more disciplined than ad-hoc "the docs say the response has X" — the type IS the source.
 
@@ -90,12 +93,13 @@ The pattern was borrowed from [Superpowers](https://github.com/obra/superpowers)
 
 ## What this kit deliberately does NOT do
 
-- **No OpenSpec dependency.** lidr-specboot integrates with OpenSpec's `/enrich-us`, `/ff`, `/apply` workflow. We adopt the spirit (spec before code) without the tool — our LV prompts + contracts + CW briefs already serve as the spec layer.
+- **No hard Spec Kit dependency.** Spec Kit is the recommended spec layer (`specify init --here --integration claude`), and the `spec-lanes` skill makes its tasks lane-aware. Without it, LV prompts + contracts + CW briefs still serve as the spec layer.
 - **No Jira / Linear / external tooling baked in.** Skills can call MCPs if you have them, but the core workflow runs on plain markdown files.
-- **No npm package for the workflow itself.** The kit is files-in-a-folder. Run `bin/install.sh` once and you have everything. (An npm package may come in Phase 2 for `npx cclv-specboot init`.)
+- **No npm package for the workflow itself.** The kit is files-in-a-folder. Run `bin/install.sh` once and you have everything. (A packaged installer may come later.)
 
 ## Acknowledgments
 
-- [lidr-specboot](https://github.com/LIDR-academy/lidr-specboot) — origin of the multi-agent pattern + the `docs/standards/` shared-source-of-truth idea.
+- [GitHub Spec Kit](https://github.com/github/spec-kit) (MIT) — the spec → plan → tasks layer.
+- lidr-specboot by LIDR academy — origin of the `docs/standards/` shared-source-of-truth idea (repository no longer public).
 - [OpenSpec](https://github.com/Fission-AI/OpenSpec) — spec-driven workflow philosophy.
 - [Superpowers](https://github.com/obra/superpowers) — skill-writing conventions.

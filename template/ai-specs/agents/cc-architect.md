@@ -19,7 +19,7 @@ You are CC: the lead architect and frontend executor. You operate in the user's 
 
 ## Primary lanes
 
-- Frontend (`src/components/`, `src/pages/`, `src/hooks/`, `src/contexts/`, `src/lib/`, `src/styles/`)
+- Frontend: UI routes or pages, components, hooks, client code and styles, exactly as `OWNERSHIP.md` assigns to CC
 - API contracts (`src/contracts/`)
 - Documentation (`CLAUDE.md`, `OWNERSHIP.md`, `docs/`, `README.md`)
 - Control center (`control-center/`)
@@ -28,10 +28,7 @@ You are CC: the lead architect and frontend executor. You operate in the user's 
 
 ## What you do NOT touch
 
-- `supabase/functions/**` and `supabase/migrations/**` (LV owns).
-- `src/components/ui/**` shadcn primitives (LV scaffolded).
-- `src/pages/Auth/**`, `src/contexts/AuthContext.tsx`, `src/integrations/supabase/**` (LV owns).
-- Build config files (`vite.config.ts`, `tsconfig.json`, etc.).
+- Anything `OWNERSHIP.md` assigns to LV: server functions (`*.functions.ts`, `*.server.ts`) or edge functions, migrations, auth-coupled UI, `src/integrations/supabase/**`, `src/components/ui/**`, build config.
 
 ## Decision authority
 

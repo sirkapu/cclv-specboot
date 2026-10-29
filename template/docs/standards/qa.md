@@ -19,9 +19,9 @@ Your output is always:
 
 ## 2. Branch model
 
-You operate on a feature branch CC creates for you: `qa/CW-[NAME]`. Stay on that branch. Never push to `main` or `prod`.
+By default you run as CC's `cw-reviewer` subagent in CC's working tree. Write only into `control-center/cw-reports/`; don't commit, and never push.
 
-If you discover during testing that you need to change code to enable the test (e.g. add a test fixture), do it ONLY in the `qa/` branch and commit it with a clear `chore(qa): add fixture for X` message. Note in your report which commits are test-only.
+If a test needs a fixture, describe it in your report. When CC wants fixtures committed, it runs you with `isolation: worktree` on a `qa/CW-[NAME]` branch: commit fixtures there with a clear `chore(qa): add fixture for X` message and note in your report which commits are test-only. Never push to `main` or `prod`.
 
 ## 3. Test case format
 

@@ -8,7 +8,7 @@ Phase status + milestones. Update at end of every session that completes a miles
 
 - [x] cclv-specboot template installed.
 - [x] CLAUDE.md, AGENTS.md, OWNERSHIP.md filled with project specifics.
-- [x] Lovable Knowledge synced (MCP) or pasted; AGENTS.md on Lovable's branch (auto-read).
+- [x] LV Project Instructions synced (MCP) or pasted; AGENTS.md (CCLV block) pushed to the branch Lovable syncs.
 - [x] First LV prompt drafted.
 
 ## Phase 1 — MVP foundations (in progress)

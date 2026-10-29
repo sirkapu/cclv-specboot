@@ -12,8 +12,8 @@
 ## Files created
 
 - `supabase/migrations/YYYYMMDDHHMMSS_<name>.sql`
-- `supabase/functions/<name>/index.ts`
-- `supabase/functions/_shared/<helper>.ts` (if added)
+- `src/lib/<name>.functions.ts` / `<name>.server.ts` (TanStack Start), or `supabase/functions/<name>/index.ts` (Edge Functions)
+- Shared helpers (if added)
 - `src/integrations/supabase/types.ts` (regenerated)
 
 ## Files modified
@@ -67,7 +67,7 @@ For each migration:
 | Test | Result | Notes |
 |------|--------|-------|
 | Migration applies cleanly | ✅ | |
-| Edge function deploys | ✅ | |
+| Endpoint builds / deploys | ✅ | |
 | Endpoint returns expected shape | ✅ | |
 | RLS denies unauthorized access | ✅ | |
 | Idempotency key collision | ✅ | |

@@ -1,6 +1,6 @@
 # Architecture — {{PROJECT_NAME}}
 
-Stable architecture reference. Update when routes, data models, contracts, or edge functions change.
+Stable architecture reference. Update when routes, data models, contracts, or backend endpoints change.
 
 **Last updated:** {{TODAY}}
 
@@ -10,10 +10,9 @@ Stable architecture reference. Update when routes, data models, contracts, or ed
 
 | Path | Component | Purpose |
 |------|-----------|---------|
-| `/` | `pages/Home.tsx` | Landing |
-| `/auth/login` | `pages/Auth/Login.tsx` (LV) | Login |
-| `/auth/signup` | `pages/Auth/Signup.tsx` (LV) | Signup |
-| `/app` | `pages/App/index.tsx` | Main app |
+| `/` | `src/routes/index.tsx` (or `src/pages/Home.tsx` on Vite) | Landing |
+| `/auth` | `src/routes/auth.tsx` (or `src/pages/Auth/Login.tsx` on Vite) (LV) | Login / signup |
+| `/app` | `src/routes/app.tsx` (or `src/pages/App/index.tsx` on Vite) | Main app |
 
 *(empty rows pending Phase 1 features)*
 
@@ -31,7 +30,7 @@ Stable architecture reference. Update when routes, data models, contracts, or ed
 
 ---
 
-## Edge functions
+## Backend endpoints
 
 | Function | Credit cost | Status |
 |----------|-------------|--------|
@@ -43,7 +42,7 @@ Stable architecture reference. Update when routes, data models, contracts, or ed
 
 ## Contracts
 
-| Contract file | Edge function | Status |
+| Contract file | Endpoint (server function / edge function) | Status |
 |---------------|---------------|--------|
 | (none yet) | — | — |
 
@@ -63,7 +62,7 @@ Stable architecture reference. Update when routes, data models, contracts, or ed
 ## State management
 
 - **Server state:** TanStack React Query (`src/hooks/use<Resource>.ts`).
-- **Cross-page UI state:** React Context (`src/contexts/<Domain>Context.tsx`).
+- **Cross-page UI state:** React Context, or route context/loaders on TanStack Start.
 - **Component-local:** `useState` / `useReducer`.
 - **Forms:** `react-hook-form` + `zod`.
 - **Persisted:** `localStorage` via versioned schema.
@@ -82,29 +81,16 @@ Stable architecture reference. Update when routes, data models, contracts, or ed
 
 | Integration | Purpose | Secret name |
 |-------------|---------|-------------|
-| Supabase | DB + Auth + Storage + Realtime + Edge Functions | (built-in) |
+| Lovable Cloud (Supabase) | DB + Auth + Storage + Realtime (+ Edge Functions on the Vite stack) | (built-in) |
 | (others as added) | — | — |
 
 ---
 
 ## Key file paths
 
+The `src/` layout depends on the Lovable stack: see "Key paths" in `CLAUDE.md`, and `OWNERSHIP.md` for who owns each path.
+
 ```
-src/
-├── components/           ← CC owns
-│   └── ui/               ← LV scaffolded (shadcn)
-├── pages/                ← CC owns (except Auth/ → LV)
-├── contracts/            ← CC owns (LV reads)
-├── contexts/             ← CC owns (except AuthContext → LV)
-├── hooks/                ← CC owns (except useAuth/useSession → LV)
-├── lib/
-├── styles/
-└── integrations/supabase/ ← LV owns (generated types)
-
-supabase/
-├── functions/            ← LV owns
-└── migrations/           ← LV owns
-
 control-center/           ← CC owns (LV writes only into lv-responses/, lv-blockers/)
 docs/                     ← CC owns
 ai-specs/                 ← CC owns

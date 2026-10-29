@@ -74,3 +74,16 @@ This is the strongest surviving objection to the ladder and it is **unresolved**
 ## Attribution
 
 §1–§4 are adapted from [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) (MIT). `base.md` previously carried no attribution at all; it now does. Note that MIT requires reproducing the copyright **and** permission notice for substantial portions — a link plus "(MIT)" is credit, not compliance. Full notice handling is **open** across all three repos.
+
+## Update 2026-10-28
+
+The three ratified lines are unchanged. `template/docs/standards/base.md` §1 now adds an **operational mapping** below them instead of rewording them:
+
+- Trivial / Standard → default effort (medium on Opus 5.5), or `/effort low` for trivial work.
+- Major → `/effort high` or `xhigh`, or `ultrathink` typed into the prompt; for LV, a `plan_mode` message first.
+
+What changed since this record was written:
+
+- The `ultrathink` keyword is now documented on Claude Code's model-configuration page. Typed in a prompt it adds a deeper-reasoning instruction for that turn; since v2.1.311 (current: v2.1.312) it can also raise that turn to `xhigh`. Written inside a file it has no documented effect.
+- On Opus 5.5, Sonnet 5.5, Haiku 5.5 and the Fable models, thinking can't be switched off; effort is the dial. So "no extended-thinking trigger" on the Trivial rung now just means "don't raise effort". The wording stays byte-pinned to `sirkapu/gadd`; any rewording should be proposed there first.
+
